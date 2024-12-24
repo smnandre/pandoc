@@ -1,0 +1,65 @@
+{
+    "name": "smnandre/pandoc",
+    "description": "Pandoc PHP - Document Converter for Mardown, HTML, Latex, PDF, RST",
+    "license": "MIT",
+    "type": "library",
+    "keywords": [
+        "pandoc",
+        "convert",
+        "php-cli",
+        "markdown",
+        "rst",
+        "html",
+        "md",
+        "pdf",
+        "converter",
+        "cli"
+    ],
+    "authors": [
+        {
+            "name": "Simon André",
+            "email": "smn.andre@gmail.com",
+            "homepage": "https://smnandre.dev"
+        }
+    ],
+    "homepage": "https://github.com/smnandre/pandoc/",
+    "support": {
+        "issues": "https://github.com/smnandre/pandoc/issues"
+    },
+    "require": {
+        "php": "^8.3",
+        "psr/log": "^2.0 || ^3.0",
+        "symfony/process": "^7.1"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.65",
+        "phpstan/phpstan": "^2.0",
+        "phpunit/phpunit": "^11.5"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "Pandoc\\": "src/"
+        },
+        "exclude-from-classmap": [
+            "/tests/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Pandoc\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "scripts": {
+        "analyse": "phpstan analyse",
+        "cs-fix": "php-cs-fixer fix --diff",
+        "cs-lint": "php-cs-fixer check --diff",
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-html=coverage"
+    }
+}

@@ -1,4 +1,8 @@
-# Pandoc PHP - Documents Convertor
+<div align="center">
+
+# Pandoc PHP - Advanced Document Converter
+
+<p>Markdown - HTML - PDF - DOCX - RST - LaTeX - Reveal Slides</p>
 
 [![PHP Version](https://img.shields.io/badge/%C2%A0php-%3E%3D%208.3-777BB4.svg?logo=php&logoColor=white)](https://github.com/smnandre/pandoc/blob/main/composer.json)
 [![CI](https://github.com/smnandre/pandoc/actions/workflows/CI.yaml/badge.svg)](https://github.com/smnandre/pandoc/actions)
@@ -8,13 +12,7 @@
 
 This PHP library offers a modern PHP wrapper for the [Pandoc](https://pandoc.org/) document converter.
 
-```
-pandoc --pdf-engine --help 
-Argument of --pdf-engine must be one of weasyprint, wkhtmltopdf, pagedjs-cli, prince, pdflatex, lualatex, xelatex, latexmk, tectonic, pdfroff, typst, context
-```
-
-
-## Pandoc PHP
+</div>
 
 ## Installation
 
@@ -120,7 +118,6 @@ Pandoc::create()->convert($options);
 
 * https://github.com/pandoc/actions/tree/main/setup
 
-## Contributing
 
 Any contribution is welcome!
 
@@ -146,11 +143,12 @@ php vendor/bin/phpstan analyse
 php vendor/bin/phpunit
 ```
 
-## Credits
-
 [Pandoc PHP](https://github.com/smnandre/pandoc) is maintained by [Simon André](https://github.com/smnandre)
 
-Pandoc is a project by [John MacFarlane](https://johnmacfarlane.net/) and contributors.
+Pandoc is a project by [John MacFarlane](https://johnmacfarlane.net/) and contributors.## Contributing
+
+## Credits
+
 
 ## License
 

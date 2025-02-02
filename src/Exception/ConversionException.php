@@ -11,4 +11,7 @@
 
 namespace Pandoc\Exception;
 
-class RuntimeException extends \RuntimeException implements ExceptionInterface {}
+/**
+ * @author Simon André <smn.andre@gmail.com>
+ */
+class ConversionException extends \RuntimeException implements PandocException {}

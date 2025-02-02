@@ -9,24 +9,24 @@
  * file that was distributed with this source code.
  */
 
-namespace Pandoc\Tests\Convertor;
+namespace Pandoc\Tests\Converter\Process;
 
-use Pandoc\Convertor\ExitCode;
+use Pandoc\Converter\Process\ExitCode;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ExitCode::class)]
 class ExitCodeTest extends TestCase
 {
+    #[Test]
     public function testSuccess(): void
     {
-        $exitCode = ExitCode::Success;
-        $this->assertSame(0, $exitCode->value);
-
         $exitCode = ExitCode::tryFrom(0);
         $this->assertTrue($exitCode->isSuccess());
     }
 
+    #[Test]
     public function testFailures(): void
     {
         foreach (ExitCode::cases() as $exitCode) {

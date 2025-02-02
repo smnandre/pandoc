@@ -11,42 +11,86 @@
 
 namespace Pandoc;
 
-use Countable;
-use IteratorAggregate;
-
 /**
- * @implements IteratorAggregate<string, string>
+ * @author Simon André <smn.andre@gmail.com>
  */
-final class Options implements Countable, IteratorAggregate
+final class Options implements \Countable, \IteratorAggregate
 {
-    /**
-     * @var array<string, string>
-     */
     private array $options = [];
+
+    private iterable $input = [];
+
+    private ?string $output = null;
+
+    private ?string $outputDir = null;
+
+    private ?string $format = null;
 
     public static function create(): self
     {
         return new self();
     }
 
-    public function shiftHeadingLevelBy(int $level): self
+    public function getInput(): iterable
     {
-        return $this->set('--shift-heading-level-by', (string) $level);
+        return $this->input;
     }
 
-    public function fileScope(bool $fileScope = true): self
+    public function setInput(iterable|string $input): self
     {
-        return $this->bool('--file-scope', $fileScope);
+        if (is_string($input)) {
+            $input = [$input];
+        }
+
+        $this->input = $input;
+
+        return $this;
     }
 
-    public function preserveTabs(bool $preserveTabs = true): self
+    public function getOutput(): ?string
     {
-        return $this->bool('--preserve-tabs', $preserveTabs);
+        return $this->output;
     }
 
-    public function tabStop(int $tabStop): self
+    public function setOutput(string $output): self
     {
-        return $this->set('--tab-stop', (string) $tabStop);
+        $this->output = $output;
+
+        return $this;
+    }
+
+    public function getOutputDir(): ?string
+    {
+        return $this->outputDir;
+    }
+
+    public function setOutputDir(?string $outputDir): self
+    {
+        $this->outputDir = $outputDir;
+
+        return $this;
+    }
+
+    public function getFormat(): ?string
+    {
+        return $this->format;
+    }
+
+    public function setFormat(?string $format): self
+    {
+        $this->format = $format;
+
+        return $this;
+    }
+
+    public function columns(int $columns): self
+    {
+        return $this->set('--columns', (string) $columns);
+    }
+
+    public function count(): int
+    {
+        return count($this->options);
     }
 
     public function dataDir(string $dir): self
@@ -59,14 +103,42 @@ final class Options implements Countable, IteratorAggregate
         return $this->bool('--fail-if-warnings', $fail);
     }
 
+    public function fileScope(bool $fileScope = true): self
+    {
+        return $this->bool('--file-scope', $fileScope);
+    }
+
+    public function from(string $format): self
+    {
+        return $this->string('--from', $format);
+    }
+
+    /**
+     * @return \ArrayIterator<string, string>
+     */
+    public function getIterator(): \ArrayIterator
+    {
+        return new \ArrayIterator($this->toArray());
+    }
+
     public function idPrefix(string $prefix): self
     {
         return $this->string('--id-prefix', $prefix);
     }
 
+    public function input(string $input): self
+    {
+        return $this->string('-i', $input);
+    }
+
     public function listTables(bool $list = true): self
     {
         return $this->bool('--list-tables', $list);
+    }
+
+    public function numberSections(bool $number = true): self
+    {
+        return $this->bool('--number-sections', $number);
     }
 
     public function output(string $output): self
@@ -79,6 +151,11 @@ final class Options implements Countable, IteratorAggregate
         return $this->string('-t', $format);
     }
 
+    public function preserveTabs(bool $preserveTabs = true): self
+    {
+        return $this->bool('--preserve-tabs', $preserveTabs);
+    }
+
     public function referenceLinks(bool $referenceLinks = true): self
     {
         return $this->bool('--reference-links', $referenceLinks);
@@ -89,43 +166,24 @@ final class Options implements Countable, IteratorAggregate
         return $this->bool('--sandbox', $sandbox);
     }
 
+    public function shiftHeadingLevelBy(int $level): self
+    {
+        return $this->string('--shift-heading-level-by', (string) $level);
+    }
+
     public function standalone(bool $standalone = true): self
     {
         return $this->bool('--standalone', $standalone);
     }
 
-    public function wrap(string $wrap = 'auto'): self
-    {
-        if (!in_array($wrap, ['auto', 'none', 'preserve'], true)) {
-            throw new \InvalidArgumentException(sprintf('Invalid wrap value: "%s". Expected "auto", "none" or "preserve".', $wrap));
-        }
-
-        return $this->string('--wrap', $wrap);
-    }
-
-    public function columns(int $columns): self
-    {
-        return $this->set('--columns', (string) $columns);
-    }
-
-    public function toc(bool $toc = true): self
-    {
-        return $this->bool('--toc', $toc);
-    }
-
-    public function tocDepth(int $depth): self
-    {
-        return $this->set('--toc-depth', (string) $depth);
-    }
-
-    public function numberSections(bool $number = true): self
-    {
-        return $this->bool('--number-sections', $number);
-    }
-
     public function stripComments(bool $strip = true): self
     {
         return $this->bool('--strip-comments', $strip);
+    }
+
+    public function tabStop(int $tabStop): self
+    {
+        return $this->set('--tab-stop', (string) $tabStop);
     }
 
     public function tableOfContent(bool $toc = true): self
@@ -138,28 +196,19 @@ final class Options implements Countable, IteratorAggregate
         return $this->string('--title-prefix', $string);
     }
 
-    public function count(): int
+    public function to(string $format): self
     {
-        return count($this->options);
+        return $this->string('--to', $format);
     }
 
-    /**
-     * @return \ArrayIterator<string, string>
-     */
-    public function getIterator(): \ArrayIterator
+    public function toc(bool $toc = true): self
     {
-        return new \ArrayIterator($this->toArray());
+        return $this->bool('--toc', $toc);
     }
 
-    /**
-     * @return array<string, string>
-     */
-    public function toArray(): array
+    public function tocDepth(int $depth): self
     {
-        $options = $this->options;
-        ksort($options, SORT_NATURAL);
-
-        return $options;
+        return $this->set('--toc-depth', (string) $depth);
     }
 
     public function __toString(): string
@@ -167,6 +216,14 @@ final class Options implements Countable, IteratorAggregate
         return implode(' ', array_map(function (string $name, string $value): string {
             return $name . '=' . $value;
         }, array_keys($this->options), $this->options));
+    }
+
+    public function toArray(): array
+    {
+        $options = $this->options;
+        ksort($options, SORT_NATURAL);
+
+        return $options;
     }
 
     private function bool(string $name, bool $value): self
@@ -192,5 +249,31 @@ final class Options implements Countable, IteratorAggregate
         $this->options[$name] = $value;
 
         return $this;
+    }
+
+    public function merge(Options $other): self
+    {
+        $merged = clone $this;
+
+        // Merge options
+        foreach ($other->toArray() as $name => $value) {
+            $merged = $merged->set($name, $value); // Use the internal set() to ensure consistency
+        }
+
+        // Override input, output, format if set in $other
+        if ($other->getInput() !== []) {
+            $merged = $merged->setInput($other->getInput());
+        }
+        if ($other->getOutput() !== null) {
+            $merged = $merged->setOutput($other->getOutput());
+        }
+        if ($other->getOutputDir() !== null) {
+            $merged = $merged->setOutputDir($other->getOutputDir());
+        }
+        if ($other->getFormat() !== null) {
+            $merged = $merged->setFormat($other->getFormat());
+        }
+
+        return $merged;
     }
 }

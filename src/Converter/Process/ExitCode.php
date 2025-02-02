@@ -9,11 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Pandoc\Convertor;
+namespace Pandoc\Converter\Process;
 
 /**
  * @see https://pandoc.org/MANUAL.html#exit-codes
- */
+ *
+ * @internal
+ *
+ * @author Simon André <smn.andre@gmail.com>
+*/
 enum ExitCode: int
 {
     case Success = 0;

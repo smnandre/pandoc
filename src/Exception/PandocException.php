@@ -11,4 +11,7 @@
 
 namespace Pandoc\Exception;
 
-class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface {}
+/**
+ * @author Simon André <smn.andre@gmail.com>
+ */
+interface PandocException extends \Throwable {}

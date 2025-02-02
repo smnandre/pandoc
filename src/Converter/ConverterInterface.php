@@ -9,6 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Pandoc\Exception;
+namespace Pandoc\Converter;
 
-interface ExceptionInterface extends \Throwable {}
+use Pandoc\Options;
+
+/**
+ * @author Simon André <smn.andre@gmail.com>
+ */
+interface ConverterInterface
+{
+    public function convert(Options $options): void;
+}

@@ -9,6 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Pandoc\Convertor;
+namespace Pandoc\Exception;
 
-final class DockerConvertor extends ProcessConvertor {}
+/**
+ * @author Simon André <smn.andre@gmail.com>
+ */
+class InvalidOptionException extends \RuntimeException implements PandocException {}

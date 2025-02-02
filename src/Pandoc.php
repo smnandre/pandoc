@@ -11,42 +11,39 @@
 
 namespace Pandoc;
 
-use Pandoc\Convertor\ConvertorInterface;
-use Pandoc\Convertor\SystemConvertor;
-use Psr\Log\LoggerInterface;
+use Pandoc\Converter\ConverterInterface;
+use Pandoc\Converter\Process\ProcessConverter;
 
-final class Pandoc implements ConvertorInterface
+/**
+ * @author Simon André <smn.andre@gmail.com>
+ */
+final class Pandoc implements ConverterInterface
 {
-    public function __construct(
-        private readonly ConvertorInterface $convertor,
-        private readonly Options $options,
-    ) {}
+    private ConverterInterface $converter;
 
-    public static function create(
-        ?Options $options = null,
-        ?LoggerInterface $logger = null,
-    ): self {
-        $convertor = SystemConvertor::create();
-        //            $this->convertor = $this->createSystemConvertor();
-        // detect pandoc executable
-        // $executable = 'pandoc';
-        $convertor = SystemConvertor::create($options, $logger);
+    private ?Options $defaultOptions;
 
-        return new self($convertor, $options ?? Options::create());
+    public function __construct(?ConverterInterface $converter = null, ?Options $defaultOptions = null)
+    {
+        $this->converter = $converter ?? new ProcessConverter();
+        $this->defaultOptions = $defaultOptions;
     }
 
-    public function convert(string $input, string $output, ?Options $options = null): string
+    public static function create(?ConverterInterface $converter = null, ?Options $defaultOptions = null): self
     {
-        return $this->convertor->convert($input, $output, $options ?? $this->options);
+        return new self($converter, $defaultOptions);
     }
 
-    public function listInputFormats(): array
+    /**
+     * @throws Exception\PandocException
+     */
+    public function convert(Options $options): void
     {
-        return $this->convertor->listInputFormats();
-    }
+        if ($this->defaultOptions !== null) {
+            $options = $this->defaultOptions->merge($options);
+            ;
+        }
 
-    public function listOutputFormats(): array
-    {
-        return $this->convertor->listOutputFormats();
+        $this->converter->convert($options);
     }
 }

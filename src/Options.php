@@ -11,13 +11,24 @@
 
 namespace Pandoc;
 
+use SplFileInfo;
+use Symfony\Component\Finder\Finder;
+
 /**
+ * @implements \IteratorAggregate<string, string>
+ *
  * @author Simon André <smn.andre@gmail.com>
  */
 final class Options implements \Countable, \IteratorAggregate
 {
+    /**
+     * @var array<string, string>
+     */
     private array $options = [];
 
+    /**
+     * @var iterable<\SplFileInfo>|string[]
+     */
     private iterable $input = [];
 
     private ?string $output = null;
@@ -31,11 +42,17 @@ final class Options implements \Countable, \IteratorAggregate
         return new self();
     }
 
+    /**
+    * @return iterable<\SplFileInfo|string>
+    */
     public function getInput(): iterable
     {
         return $this->input;
     }
 
+    /**
+    * @param iterable<\SplFileInfo|string>|string $input
+    */
     public function setInput(iterable|string $input): self
     {
         if (is_string($input)) {
@@ -218,6 +235,9 @@ final class Options implements \Countable, \IteratorAggregate
         }, array_keys($this->options), $this->options));
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function toArray(): array
     {
         $options = $this->options;

@@ -53,14 +53,14 @@ final class ProcessConverter implements ConverterInterface
                 $this->runPandoc($options, $file);
             }
         } else {
-            if (!is_iterable($input)) {
-                $input = [$input];
-            }
-
             foreach ($input as $inputFile) {
                 if ($output !== null && !is_dir(dirname($output))) {
                     mkdir(dirname($output), 0777, true);
                 }
+                if (!file_exists($inputFile)) {
+                    throw new ConversionException('Input file not found: ' . $inputFile);
+                }
+
                 $this->runPandoc($options, new \SplFileInfo($inputFile));
             }
         }
@@ -85,8 +85,7 @@ final class ProcessConverter implements ConverterInterface
         try {
             $process->mustRun();
 
-            // Check for error output even if mustRun() succeeded
-            if (!empty($process->getErrorOutput())) {
+            if ($process->getErrorOutput() && is_int($process->getExitCode())) {
                 $exitCode = ExitCode::tryFrom($process->getExitCode());
 
                 $this->logger->error('Pandoc conversion failed (no exception thrown): {message}', [
@@ -102,7 +101,7 @@ final class ProcessConverter implements ConverterInterface
                 );
             }
         } catch (ProcessFailedException $e) {
-            $exitCode = ExitCode::tryFrom($process->getExitCode());
+            $exitCode = ExitCode::tryFrom($process->getExitCode() ?? -1);
 
             $this->logger->error('Pandoc conversion failed: {message}', [
                 'message' => $e->getMessage(),
@@ -130,6 +129,9 @@ final class ProcessConverter implements ConverterInterface
         return $process;
     }
 
+    /**
+     * @return array<string>
+     */
     private function buildCommand(Options $options, string $input, ?string $output): array
     {
         $command = [$this->executable];

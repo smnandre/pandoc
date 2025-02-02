@@ -52,10 +52,11 @@ class TestCase extends BaseTestCase
     {
         $tempDir = $this->getTemporaryDirectory();
         if (is_dir($tempDir)) {
-            $files = glob($tempDir . '/*');
-            foreach ($files as $file) {
-                if (is_file($file)) {
-                    unlink($file);
+            if ($files = glob($tempDir . '/*')) {
+                foreach ($files as $file) {
+                    if (is_file($file)) {
+                        unlink($file);
+                    }
                 }
             }
             rmdir($tempDir);

@@ -13,19 +13,18 @@ namespace Pandoc\Tests\Unit;
 
 use Pandoc\Converter\ConverterInterface;
 use Pandoc\Converter\Process\PandocExecutableFinder;
+use Pandoc\Converter\Process\ProcessConverter;
 use Pandoc\Options;
 use Pandoc\Pandoc;
-use Pandoc\Tests\Converter\Process\PandocExecutableFinderTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use Pandoc\Tests\TestCase;
-use src\Convertor\ProcessConvertor;
 
 #[CoversClass(Pandoc::class)]
 #[UsesClass(Options::class)]
-#[UsesClass(ProcessConvertor::class)]
+#[UsesClass(ProcessConverter::class)]
 #[UsesClass(PandocExecutableFinder::class)]
 class PandocTest extends TestCase
 {

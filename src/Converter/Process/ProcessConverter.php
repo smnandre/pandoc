@@ -139,12 +139,12 @@ final class ProcessConverter implements ConverterInterface
         $pandoc = $this->executable;
 
         $process = new Process([$pandoc, ...$args]);
-        
+
         $process->run();
 
         if (!$process->isSuccessful()) {
-            $exitCode = \ExitCode::tryFrom($process->getExitCode());
-            throw new ConversionException($process->getErrorOutput(), $process->getExitCode(), $exitCode->name);
+            $exitCode = ExitCode::tryFrom($process->getExitCode() ?? -1);
+            throw new ConversionException(trim($exitCode?->name . ' ' . $process->getErrorOutput()), $exitCode->value ?? -1);
         }
 
         return $process->getOutput();

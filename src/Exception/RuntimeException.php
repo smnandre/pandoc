@@ -14,4 +14,4 @@ namespace Pandoc\Exception;
 /**
  * @author Simon André <smn.andre@gmail.com>
  */
-class InvalidOptionException extends \RuntimeException {}
+class RuntimeException extends \RuntimeException implements PandocException {}

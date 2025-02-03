@@ -52,12 +52,14 @@ class ProcessConverterTest extends TestCase
     #[Test]
     public function it_throws_exception_if_pandoc_executable_is_not_found(): void
     {
-        $this->markTestSkipped('This test is skipped because it requires the pandoc executable to be missing.');
+        if (null !== (new ExecutableFinder())->find('pandoc')) {
+            $this->markTestSkipped('Pandoc executable found on the system.');
+        }
 
         $this->expectException(ConversionException::class);
         $this->expectExceptionMessage('Pandoc executable not found.');
 
-        new ProcessConverter(executable: null, logger: $this->loggerMock);
+        new ProcessConverter(executable: '/dev/null');
     }
 
     #[Test]

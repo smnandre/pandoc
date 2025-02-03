@@ -11,9 +11,6 @@
 
 namespace Pandoc;
 
-use SplFileInfo;
-use Symfony\Component\Finder\Finder;
-
 /**
  * @implements \IteratorAggregate<string, string>
  *

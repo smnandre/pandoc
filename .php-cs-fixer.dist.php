@@ -23,6 +23,8 @@ return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)
     ->setRules([
         '@PER-CS' => true,
+        '@Symfony' => true,
+        '@Symfony:risky' => true,
         'strict_param' => true,
         'header_comment' => ['header' => $licence],
     ])

@@ -46,4 +46,41 @@ final class Pandoc implements ConverterInterface
 
         $this->converter->convert($options);
     }
+
+    public function getPandocInfo(): PandocInfo
+    {
+        return $this->converter->getPandocInfo();
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function listHighlightLanguages(): array
+    {
+        return $this->converter->listHighlightLanguages();
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function listHighlightStyles(): array
+    {
+        return $this->converter->listHighlightStyles();
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function listInputFormats(): array
+    {
+        return $this->converter->listInputFormats();
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function listOutputFormats(): array
+    {
+        return $this->converter->listOutputFormats();
+    }
 }

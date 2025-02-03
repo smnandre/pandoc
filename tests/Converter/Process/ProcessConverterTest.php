@@ -15,6 +15,7 @@ use Pandoc\Converter\Process\PandocExecutableFinder;
 use Pandoc\Converter\Process\ProcessConverter;
 use Pandoc\Exception\ConversionException;
 use Pandoc\Options;
+use Pandoc\PandocInfo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -22,9 +23,11 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
 use Pandoc\Tests\TestCase;
+use Symfony\Component\Process\ExecutableFinder;
 
 #[CoversClass(ProcessConverter::class)]
 #[UsesClass(Options::class)]
+#[UsesClass(PandocInfo::class)]
 #[UsesClass(PandocExecutableFinder::class)]
 class ProcessConverterTest extends TestCase
 {
@@ -185,5 +188,48 @@ class ProcessConverterTest extends TestCase
         unlink($tempFile);
 
         $this->assertMatchesRegularExpression('#<h1.*>.*</h1>#', $output);
+    }
+
+    #[Test]
+    public function it_returns_pandoc_info(): void
+    {
+        $info = $this->converter->getPandocInfo();
+
+        $this->assertInstanceOf(PandocInfo::class, $info);
+        $this->assertNotEmpty($info->getVersion());
+    }
+
+    #[Test]
+    public function it_can_list_input_formats(): void
+    {
+        $inputFormats = $this->converter->listInputFormats();
+        $this->assertContains('markdown', $inputFormats);
+        $this->assertContains('rst', $inputFormats);
+    }
+
+    #[Test]
+    public function it_can_list_output_formats(): void
+    {
+        $outputFormats = $this->converter->listOutputFormats();
+        $this->assertContains('html', $outputFormats);
+        $this->assertContains('pdf', $outputFormats);
+    }
+
+    #[Test]
+    public function it_can_list_highlight_languages(): void
+    {
+        $languages = $this->converter->listHighlightLanguages();
+        $this->assertContains('html', $languages);
+        $this->assertContains('php', $languages);
+        $this->assertContains('markdown', $languages);
+    }
+
+    #[Test]
+    public function it_can_list_highlight_styles(): void
+    {
+        $styles = $this->converter->listHighlightStyles();
+        $this->assertContains('breezedark', $styles);
+        $this->assertContains('haddock', $styles);
+        $this->assertContains('kate', $styles);
     }
 }

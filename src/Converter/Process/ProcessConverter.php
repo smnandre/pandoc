@@ -14,6 +14,7 @@ namespace Pandoc\Converter\Process;
 use Pandoc\Converter\ConverterInterface;
 use Pandoc\Exception\ConversionException;
 use Pandoc\Options;
+use Pandoc\PandocInfo;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Finder\Finder;
@@ -64,6 +65,99 @@ final class ProcessConverter implements ConverterInterface
                 $this->runPandoc($options, new \SplFileInfo($inputFile));
             }
         }
+    }
+
+    /**
+     * @throws ConversionException
+     */
+    public function getPandocInfo(): PandocInfo
+    {
+        $process = new Process([$this->executable, '--version']);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new ConversionException('Could not retrieve Pandoc information. Make sure Pandoc is installed and accessible.');
+        }
+
+        $output = $process->getOutput();
+
+        preg_match('/pandoc ([\d.]+)/', $output, $matches);
+        $version = $matches[1] ?? '';
+
+        preg_match('/Scripting engine: Lua ([\d.]+)/', $output, $matches);
+        $luaVersion = $matches[1] ?? '';
+
+        return new PandocInfo(
+            $this->executable,
+            $version,
+            $luaVersion,
+        );
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function listInputFormats(): array
+    {
+        $output = $this->run('--list-input-formats');
+
+        return $this->list($output);
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function listOutputFormats(): array
+    {
+        $output = $this->run('--list-output-formats');
+
+        return $this->list($output);
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function listHighlightLanguages(): array
+    {
+        $output = $this->run('--list-highlight-languages');
+
+        return $this->list($output);
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function listHighlightStyles(): array
+    {
+        $output = $this->run('--list-highlight-styles');
+
+        return $this->list($output);
+    }
+
+    private function run(string ...$args): string
+    {
+        $pandoc = $this->executable;
+
+        $process = new Process([$pandoc, ...$args]);
+        
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            $exitCode = \ExitCode::tryFrom($process->getExitCode());
+            throw new ConversionException($process->getErrorOutput(), $process->getExitCode(), $exitCode->name);
+        }
+
+        return $process->getOutput();
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function list(string $string): array
+    {
+        $lines = explode("\n", $string);
+
+        return array_values(array_filter($lines));
     }
 
     private function runPandoc(Options $options, \SplFileInfo $inputFile): void

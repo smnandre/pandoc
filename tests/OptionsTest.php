@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Pandoc\Tests\Unit;
+namespace Pandoc\Tests;
 
 use Pandoc\Options;
 use PHPUnit\Framework\Attributes\CoversClass;

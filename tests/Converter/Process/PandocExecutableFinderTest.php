@@ -25,7 +25,9 @@ class PandocExecutableFinderTest extends TestCase
         $finder = new PandocExecutableFinder();
         $path = $finder->find();
 
-        $this->assertNotEmpty($path);
+        $this->assertNotNull($path);
+        $this->assertIsString($path);
+        $this->assertFileExists($path);
         $this->assertTrue(is_executable($path));
     }
 }

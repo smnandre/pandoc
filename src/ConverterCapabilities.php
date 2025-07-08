@@ -106,13 +106,13 @@ final class ConverterCapabilities
     public function getInputFormatsForExtension(string $extension): array
     {
         $formats = [];
-        
+
         foreach (InputFormat::cases() as $format) {
             if ($format->supportsExtension($extension) && $this->supportsInputFormat($format)) {
                 $formats[] = $format;
             }
         }
-        
+
         return $formats;
     }
 
@@ -124,13 +124,13 @@ final class ConverterCapabilities
     public function getOutputFormatsForExtension(string $extension): array
     {
         $formats = [];
-        
+
         foreach (OutputFormat::cases() as $format) {
             if ($format->getExtension() === ltrim($extension, '.') && $this->supportsOutputFormat($format)) {
                 $formats[] = $format;
             }
         }
-        
+
         return $formats;
     }
 

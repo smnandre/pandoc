@@ -104,15 +104,15 @@ enum InputFormat: string
     public function supportsExtension(string $extension): bool
     {
         $extension = ltrim(strtolower($extension), '.');
-        
+
         return match ($this) {
-            self::MARKDOWN, self::GFM, self::COMMONMARK => in_array($extension, ['md', 'markdown', 'mkd', 'mdown']),
-            self::HTML => in_array($extension, ['html', 'htm']),
+            self::MARKDOWN, self::GFM, self::COMMONMARK => in_array($extension, ['md', 'markdown', 'mkd', 'mdown'], true),
+            self::HTML => in_array($extension, ['html', 'htm'], true),
             self::DOCX => $extension === 'docx',
             self::ODT => $extension === 'odt',
             self::EPUB => $extension === 'epub',
-            self::LATEX => in_array($extension, ['tex', 'latex']),
-            self::RST => in_array($extension, ['rst', 'rest']),
+            self::LATEX => in_array($extension, ['tex', 'latex'], true),
+            self::RST => in_array($extension, ['rst', 'rest'], true),
             self::IPYNB => $extension === 'ipynb',
             self::JSON => $extension === 'json',
             self::CSV => $extension === 'csv',
@@ -132,7 +132,7 @@ enum InputFormat: string
                 return $format;
             }
         }
-        
+
         return null;
     }
 }

@@ -45,7 +45,7 @@ final class BatchConverter
         InputSource $input,
         OutputTarget $output,
         OutputFormat $format,
-        ?ConversionOptions $options = null
+        ?ConversionOptions $options = null,
     ): self {
         $this->jobs[] = [
             'input' => $input,
@@ -83,12 +83,12 @@ final class BatchConverter
             try {
                 $converter = new DocumentConverter($this->converter, $this->defaultOptions);
                 $finalOptions = $this->mergeBatchOptions($job['options']);
-                
+
                 $result = $converter->convert(
                     $job['input'],
                     $job['output'],
                     $job['format'],
-                    $finalOptions
+                    $finalOptions,
                 );
 
                 $results[] = $result;
@@ -126,12 +126,12 @@ final class BatchConverter
             try {
                 $converter = new DocumentConverter($this->converter, $this->defaultOptions);
                 $finalOptions = $this->mergeBatchOptions($job['options']);
-                
+
                 $result = $converter->convert(
                     $job['input'],
                     $job['output'],
                     $job['format'],
-                    $finalOptions
+                    $finalOptions,
                 );
 
                 $results[] = $result;
@@ -177,19 +177,19 @@ final class BatchConverter
         string $outputDir,
         OutputFormat $format,
         string $pattern = '*.md',
-        ?ConversionOptions $options = null
+        ?ConversionOptions $options = null,
     ): self {
         $finder = new \Symfony\Component\Finder\Finder();
         $finder->files()->in($inputDir)->name($pattern);
 
         $batch = new self(new \Pandoc\Converter\Process\ProcessConverter());
-        
+
         foreach ($finder as $file) {
             $input = InputSource::file($file->getRealPath());
-            $outputPath = $outputDir . DIRECTORY_SEPARATOR . 
+            $outputPath = $outputDir . DIRECTORY_SEPARATOR .
                          $file->getBasename('.' . $file->getExtension()) . '.' . $format->getExtension();
             $output = OutputTarget::file($outputPath);
-            
+
             $batch->add($input, $output, $format, $options);
         }
 
@@ -205,7 +205,7 @@ final class BatchConverter
         array $inputFiles,
         string $outputDir,
         OutputFormat $format,
-        ?ConversionOptions $options = null
+        ?ConversionOptions $options = null,
     ): self {
         $batch = new self(new \Pandoc\Converter\Process\ProcessConverter());
 
@@ -214,7 +214,7 @@ final class BatchConverter
             $basename = pathinfo($inputFile, PATHINFO_FILENAME);
             $outputPath = $outputDir . DIRECTORY_SEPARATOR . $basename . '.' . $format->getExtension();
             $output = OutputTarget::file($outputPath);
-            
+
             $batch->add($input, $output, $format, $options);
         }
 

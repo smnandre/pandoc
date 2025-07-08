@@ -140,7 +140,7 @@ enum OutputFormat: string
         return match ($this) {
             self::ASC_II_DOC => 'adoc',
             self::BEAMER => 'tex',
-            self::COMMONMARK, self::GFM, self::MARKDOWN, self::MARKDOWN_MMD, 
+            self::COMMONMARK, self::GFM, self::MARKDOWN, self::MARKDOWN_MMD,
             self::MARKDOWN_PHPEXTRA, self::MARKDOWN_STRICT => 'md',
             self::CONTEXT => 'tex',
             self::DOCBOOK, self::DOCBOOK4, self::DOCBOOK5 => 'xml',
@@ -207,13 +207,13 @@ enum OutputFormat: string
     public static function fromExtension(string $extension): ?self
     {
         $extension = ltrim(strtolower($extension), '.');
-        
+
         foreach (self::cases() as $format) {
             if ($format->getExtension() === $extension) {
                 return $format;
             }
         }
-        
+
         return null;
     }
 }

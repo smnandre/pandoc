@@ -165,7 +165,7 @@ final class InputSource
             InputSourceType::FILES => $this->source,
             InputSourceType::FINDER => array_map(
                 fn(\SplFileInfo $file) => $file->getRealPath(),
-                iterator_to_array($this->source)
+                iterator_to_array($this->source),
             ),
             default => [],
         };

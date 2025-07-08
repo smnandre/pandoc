@@ -38,13 +38,13 @@ class DocumentConverterTest extends TestCase
     public function it_can_convert_string_content(): void
     {
         $converter = DocumentConverter::create(new ConverterMock());
-        
+
         $input = InputSource::string('# Hello World', InputFormat::MARKDOWN);
         $output = OutputTarget::string();
         $format = OutputFormat::HTML;
-        
+
         $result = $converter->convert($input, $output, $format);
-        
+
         $this->assertInstanceOf(ConversionResult::class, $result);
         $this->assertTrue($result->isStringResult());
         $this->assertNotNull($result->getContent());
@@ -54,16 +54,16 @@ class DocumentConverterTest extends TestCase
     public function it_can_convert_with_options(): void
     {
         $converter = DocumentConverter::create(new ConverterMock());
-        
+
         $input = InputSource::string('# Hello World', InputFormat::MARKDOWN);
         $output = OutputTarget::string();
         $format = OutputFormat::HTML;
         $options = ConversionOptions::create()
             ->tableOfContents()
             ->numberSections();
-        
+
         $result = $converter->convert($input, $output, $format, $options);
-        
+
         $this->assertInstanceOf(ConversionResult::class, $result);
         $this->assertTrue($result->isSuccessful());
     }
@@ -73,7 +73,7 @@ class DocumentConverterTest extends TestCase
     {
         $converter = DocumentConverter::create(new ConverterMock());
         $batch = $converter->batch();
-        
+
         $this->assertInstanceOf(\Pandoc\BatchConverter::class, $batch);
     }
 
@@ -82,7 +82,7 @@ class DocumentConverterTest extends TestCase
     {
         $converter = DocumentConverter::create(new ConverterMock());
         $capabilities = $converter->getCapabilities();
-        
+
         $this->assertInstanceOf(\Pandoc\ConverterCapabilities::class, $capabilities);
     }
 }

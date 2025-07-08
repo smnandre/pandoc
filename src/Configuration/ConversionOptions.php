@@ -13,7 +13,7 @@ namespace Pandoc\Configuration;
 
 /**
  * Configuration options for Pandoc document conversion.
- * 
+ *
  * This class provides a fluent interface for configuring Pandoc options
  * without mixing I/O concerns with conversion settings.
  *
@@ -255,13 +255,13 @@ final class ConversionOptions implements \Countable, \IteratorAggregate
     private function bool(string $option, bool $value): self
     {
         $clone = clone $this;
-        
+
         if ($value) {
             $clone->options[$option] = 'true';
         } else {
             unset($clone->options[$option]);
         }
-        
+
         return $clone;
     }
 
@@ -304,7 +304,7 @@ final class ConversionOptions implements \Countable, \IteratorAggregate
     public function __toString(): string
     {
         $args = [];
-        
+
         foreach ($this->options as $name => $value) {
             if ($value === 'true') {
                 $args[] = $name;
@@ -312,17 +312,17 @@ final class ConversionOptions implements \Countable, \IteratorAggregate
                 $args[] = $name . '=' . escapeshellarg($value);
             }
         }
-        
+
         // Add variables
         foreach ($this->variables as $name => $value) {
             $args[] = '--variable=' . escapeshellarg($name . ':' . $value);
         }
-        
+
         // Add metadata files
         foreach ($this->metadataFiles as $file) {
             $args[] = '--metadata-file=' . escapeshellarg($file);
         }
-        
+
         return implode(' ', $args);
     }
 
@@ -332,17 +332,17 @@ final class ConversionOptions implements \Countable, \IteratorAggregate
     public function merge(ConversionOptions $other): self
     {
         $merged = clone $this;
-        
+
         foreach ($other->options as $key => $value) {
             $merged->options[$key] = $value;
         }
-        
+
         foreach ($other->variables as $key => $value) {
             $merged->variables[$key] = $value;
         }
-        
+
         $merged->metadataFiles = array_merge($merged->metadataFiles, $other->metadataFiles);
-        
+
         return $merged;
     }
 }

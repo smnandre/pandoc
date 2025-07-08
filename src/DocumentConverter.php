@@ -22,7 +22,7 @@ use Pandoc\Result\DocumentMetadata;
 
 /**
  * Modern document converter with improved API design.
- * 
+ *
  * This is the new main entry point for document conversions, providing
  * better separation of concerns and type safety compared to the legacy API.
  *
@@ -54,7 +54,7 @@ final class DocumentConverter
         InputSource $input,
         OutputTarget $output,
         OutputFormat $format,
-        ?ConversionOptions $options = null
+        ?ConversionOptions $options = null,
     ): ConversionResult {
         $startTime = microtime(true);
 
@@ -74,7 +74,7 @@ final class DocumentConverter
             throw new Exception\ConversionException(
                 'Document conversion failed: ' . $e->getMessage(),
                 0,
-                $e
+                $e,
             );
         }
     }
@@ -87,12 +87,12 @@ final class DocumentConverter
         OutputTarget $output,
         OutputFormat $format,
         DocumentMetadata $metadata,
-        ?ConversionOptions $options = null
+        ?ConversionOptions $options = null,
     ): ConversionResult {
         // For now, we'll add metadata as variables to the options
         // In a real implementation, this could write a temporary metadata file
         $enhancedOptions = $options ?? ConversionOptions::create();
-        
+
         // Add metadata as variables
         if ($metadata->getTitle()) {
             $enhancedOptions = $enhancedOptions->variable('title', $metadata->getTitle());
@@ -128,7 +128,7 @@ final class DocumentConverter
         OutputTarget $output,
         OutputFormat $format,
         ConversionOptions $options,
-        float $startTime
+        float $startTime,
     ): ConversionResult {
         if ($output->returnsString()) {
             return $this->convertToString($input, $format, $options, $startTime);
@@ -136,9 +136,9 @@ final class DocumentConverter
 
         // Convert using legacy Options for compatibility
         $legacyOptions = $this->createLegacyOptions($input, $output, $format, $options);
-        
+
         $this->converter->convert($legacyOptions);
-        
+
         $duration = microtime(true) - $startTime;
         $outputPaths = $output->getType() === \Pandoc\IO\OutputTargetType::FILE ? [$output->getTarget()] : [];
 
@@ -150,7 +150,7 @@ final class DocumentConverter
         OutputTarget $output,
         OutputFormat $format,
         ConversionOptions $options,
-        float $startTime
+        float $startTime,
     ): ConversionResult {
         if (!$output->supportsMultipleFiles()) {
             throw new Exception\ConversionException('Output target does not support multiple files');
@@ -161,18 +161,18 @@ final class DocumentConverter
 
         foreach ($filePaths as $inputPath) {
             $outputPath = $output->generateOutputPath($inputPath, $format);
-            
+
             $singleInput = InputSource::file($inputPath, $input->getFormat());
             $singleOutput = OutputTarget::file($outputPath);
-            
+
             $legacyOptions = $this->createLegacyOptions($singleInput, $singleOutput, $format, $options);
             $this->converter->convert($legacyOptions);
-            
+
             $outputPaths[] = $outputPath;
         }
 
         $duration = microtime(true) - $startTime;
-        
+
         return ConversionResult::fileResult($outputPaths, null, $duration);
     }
 
@@ -180,22 +180,22 @@ final class DocumentConverter
         InputSource $input,
         OutputFormat $format,
         ConversionOptions $options,
-        float $startTime
+        float $startTime,
     ): ConversionResult {
         // For string output, we'll use a temporary file and read it back
         $tempOutput = OutputTarget::temporary('.' . $format->getExtension());
-        
+
         try {
             $legacyOptions = $this->createLegacyOptions($input, $tempOutput, $format, $options);
             $this->converter->convert($legacyOptions);
-            
+
             $content = file_get_contents($tempOutput->getTarget());
             if ($content === false) {
                 throw new Exception\ConversionException('Failed to read converted content');
             }
-            
+
             $duration = microtime(true) - $startTime;
-            
+
             return ConversionResult::stringResult($content, null, $duration);
         } finally {
             $tempOutput->cleanup();
@@ -206,7 +206,7 @@ final class DocumentConverter
         InputSource $input,
         OutputTarget $output,
         OutputFormat $format,
-        ConversionOptions $options
+        ConversionOptions $options,
     ): Options {
         $legacyOptions = Options::create();
 
@@ -259,7 +259,7 @@ final class DocumentConverter
     {
         if ($input->isMultiple() && !$output->supportsMultipleFiles()) {
             throw new Exception\ConversionException(
-                'Multiple input files require an output directory or compatible output target'
+                'Multiple input files require an output directory or compatible output target',
             );
         }
 

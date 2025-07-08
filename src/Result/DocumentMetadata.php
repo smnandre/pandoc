@@ -80,7 +80,7 @@ final class DocumentMetadata
     {
         $title = $data['title'] ?? null;
         $author = $data['author'] ?? null;
-        
+
         $date = null;
         if (isset($data['date'])) {
             if ($data['date'] instanceof \DateTimeInterface) {
@@ -167,7 +167,7 @@ final class DocumentMetadata
     {
         $customFields = $this->customFields;
         $customFields[$name] = $value;
-        
+
         return new self($this->title, $this->author, $this->date, $this->keywords, $customFields);
     }
 
@@ -175,7 +175,7 @@ final class DocumentMetadata
     {
         $customFields = $this->customFields;
         unset($customFields[$name]);
-        
+
         return new self($this->title, $this->author, $this->date, $this->keywords, $customFields);
     }
 }

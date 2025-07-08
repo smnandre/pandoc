@@ -146,7 +146,7 @@ final class BatchResult implements \Countable, \IteratorAggregate
         if ($total === 0) {
             return 0.0;
         }
-        
+
         return ($this->getSuccessfulCount() / $total) * 100;
     }
 
@@ -176,30 +176,30 @@ final class BatchResult implements \Countable, \IteratorAggregate
         $total = $this->getTotalCount();
         $successful = $this->getSuccessfulCount();
         $failed = $this->getFailedCount();
-        
+
         $parts = [];
-        
+
         if ($total > 0) {
             $parts[] = "Processed {$total} document" . ($total > 1 ? 's' : '');
-            
+
             if ($successful > 0) {
                 $parts[] = "{$successful} successful";
             }
-            
+
             if ($failed > 0) {
                 $parts[] = "{$failed} failed";
             }
         }
-        
+
         if ($this->totalDuration > 0) {
             $parts[] = sprintf("in %.3fs", $this->totalDuration);
         }
-        
+
         if ($this->hasWarnings()) {
             $warningCount = count($this->getAllWarnings());
             $parts[] = "with {$warningCount} warning" . ($warningCount > 1 ? 's' : '');
         }
-        
+
         return implode(' ', $parts) ?: 'Batch operation completed';
     }
 

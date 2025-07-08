@@ -77,7 +77,7 @@ final class OutputTarget
     public static function temporary(string $suffix = '', ?string $dir = null): self
     {
         $tempFile = tempnam($dir ?? sys_get_temp_dir(), 'pandoc_') . $suffix;
-        
+
         return new self(OutputTargetType::TEMPORARY, $tempFile);
     }
 
@@ -171,7 +171,7 @@ final class OutputTarget
     {
         $basename = pathinfo($inputPath, PATHINFO_FILENAME);
         $extension = $format->getExtension();
-        
+
         return $this->target . DIRECTORY_SEPARATOR . $basename . '.' . $extension;
     }
 }

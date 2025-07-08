@@ -132,10 +132,10 @@ final class ConversionResult
         array|string $outputPaths,
         ?DocumentMetadata $metadata = null,
         float $duration = 0.0,
-        array $warnings = []
+        array $warnings = [],
     ): self {
         $paths = is_string($outputPaths) ? [$outputPaths] : $outputPaths;
-        
+
         return new self($paths, null, $metadata, $duration, $warnings);
     }
 
@@ -148,7 +148,7 @@ final class ConversionResult
         string $content,
         ?DocumentMetadata $metadata = null,
         float $duration = 0.0,
-        array $warnings = []
+        array $warnings = [],
     ): self {
         return new self([], $content, $metadata, $duration, $warnings);
     }
@@ -165,7 +165,7 @@ final class ConversionResult
             $this->content,
             $this->metadata,
             $this->duration,
-            array_merge($this->warnings, $warnings)
+            array_merge($this->warnings, $warnings),
         );
     }
 
@@ -179,7 +179,7 @@ final class ConversionResult
             $this->content,
             $metadata,
             $this->duration,
-            $this->warnings
+            $this->warnings,
         );
     }
 

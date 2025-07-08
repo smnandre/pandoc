@@ -20,17 +20,40 @@ This PHP library offers a modern PHP wrapper for the [Pandoc](https://pandoc.org
 composer require smnandre/pandoc
 ```
 
-## Basic Usage
+## Quick Start
 
-### Convert single file
+### New API (Recommended)
 
+The new API provides better type safety, separation of concerns, and additional features:
+
+```php
+use Pandoc\DocumentConverter;
+use Pandoc\Format\{InputFormat, OutputFormat};
+use Pandoc\IO\{InputSource, OutputTarget};
+use Pandoc\Configuration\ConversionOptions;
+
+// Simple conversion
+$converter = DocumentConverter::create();
+
+$result = $converter->convert(
+    InputSource::file('input.md'),
+    OutputTarget::file('output.pdf'),
+    OutputFormat::PDF
+);
+
+echo "Converted in {$result->getDuration()}s";
+```
+
+### Legacy API
+
+The legacy API is still fully supported:
 
 ```php
 use Pandoc\Options;
 use Pandoc\Pandoc;
 use Symfony\Component\Finder\Finder;
 
-// 1. Convert a single file with options:
+// Convert a single file with options:
 $options = Options::create()
     ->setInput(['input.md'])
     ->setOutput('output.pdf')
@@ -39,6 +62,95 @@ $options = Options::create()
 
 Pandoc::create()->convert($options);
 ```
+
+## New API Examples
+
+### String Conversion
+
+```php
+// Convert markdown string to HTML
+$result = $converter->convert(
+    InputSource::string('# Hello World', InputFormat::MARKDOWN),
+    OutputTarget::string(),
+    OutputFormat::HTML
+);
+
+echo $result->getContent(); // <h1>Hello World</h1>
+```
+
+### Batch Processing
+
+```php
+// Convert multiple files with progress tracking
+$batch = $converter->batch()
+    ->add(InputSource::file('ch1.md'), OutputTarget::file('ch1.html'), OutputFormat::HTML)
+    ->add(InputSource::file('ch2.md'), OutputTarget::file('ch2.html'), OutputFormat::HTML);
+
+$results = $batch->executeWithProgress(function($current, $total, $result, $error) {
+    echo "Progress: {$current}/{$total}\n";
+});
+
+echo "Success rate: {$results->getSuccessRate()}%";
+```
+
+### Directory Batch Conversion
+
+```php
+// Convert all markdown files in a directory
+$batch = BatchConverter::fromDirectories(
+    inputDir: 'docs/',
+    outputDir: 'html/',
+    format: OutputFormat::HTML,
+    pattern: '*.md'
+);
+
+$results = $batch->execute();
+```
+
+### Advanced Configuration
+
+```php
+$options = ConversionOptions::create()
+    ->tableOfContents()
+    ->numberSections()
+    ->standalone()
+    ->template('custom.html')
+    ->variable('title', 'My Document')
+    ->highlightStyle('github');
+
+$result = $converter->convert($input, $output, $format, $options);
+```
+
+## Migration from Legacy API
+
+Existing code continues to work unchanged. For new features, consider migrating:
+
+```php
+// Easy migration path
+$legacyPandoc = Pandoc::create();
+$newConverter = $legacyPandoc->newApi();
+
+// Now use the new API features
+$result = $newConverter->convert($input, $output, $format);
+```
+
+## Key Improvements in New API
+
+- **Type Safety**: Format enums prevent typos and provide IDE support
+- **Separation of Concerns**: I/O handling separate from Pandoc configuration  
+- **Rich Results**: Get output paths, content, metadata, duration, and warnings
+- **Enhanced Batch Processing**: Progress tracking and sophisticated error handling
+- **Metadata Support**: Structured document metadata extraction and injection
+- **Format Intelligence**: Auto-detection and capability checking
+- **Better Developer Experience**: Improved discoverability and IDE support
+
+## Documentation
+
+- **[New API Examples](docs/new-api-examples.md)** - Comprehensive examples using the new API
+- **[API Review Summary](docs/api-review-summary.md)** - Detailed analysis and improvements  
+- **[New API Design](docs/new-api-design.md)** - Technical design documentation
+
+## Legacy Examples
 
 ### Convert multiple files using Finder
 

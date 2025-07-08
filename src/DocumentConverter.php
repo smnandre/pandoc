@@ -194,7 +194,7 @@ final class DocumentConverter
             $outputPath = $tempOutput->getTarget();
             if (!file_exists($outputPath)) {
                 throw new Exception\ConversionException(
-                    'Expected output file was not created: ' . $outputPath
+                    'Expected output file was not created: ' . $outputPath,
                 );
             }
             $content = file_get_contents($outputPath);

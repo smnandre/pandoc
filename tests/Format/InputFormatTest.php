@@ -9,17 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Pandoc\Tests\NewApi\Format;
+namespace Pandoc\Tests\Format;
 
 use Pandoc\Format\InputFormat;
 use Pandoc\Format\OutputFormat;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Tests for format enums.
  */
-class FormatTest extends TestCase
+#[CoversClass(InputFormat::class)]
+class InputFormatTest extends TestCase
 {
     #[Test]
     public function input_format_can_detect_from_extension(): void

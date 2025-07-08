@@ -145,6 +145,8 @@ final class ConverterCapabilities
 
     /**
      * Get a summary of capabilities.
+     *
+     * @return array<string, mixed>
      */
     public function getSummary(): array
     {

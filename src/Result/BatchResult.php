@@ -14,6 +14,8 @@ namespace Pandoc\Result;
 /**
  * Result of a batch conversion operation.
  *
+ * @implements \IteratorAggregate<int, ConversionResult>
+ *
  * @author Simon André <smn.andre@gmail.com>
  */
 final class BatchResult implements \Countable, \IteratorAggregate

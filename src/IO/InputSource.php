@@ -115,17 +115,22 @@ final class InputSource
         // Try to auto-detect format from file extension
         switch ($this->type) {
             case InputSourceType::FILE:
-                return InputFormat::fromExtension(pathinfo($this->source, PATHINFO_EXTENSION));
-
+                if (is_string($this->source)) {
+                    return InputFormat::fromExtension(pathinfo($this->source, PATHINFO_EXTENSION));
+                }
+                break;
             case InputSourceType::FILES:
-                if (!empty($this->source)) {
+                if (is_array($this->source) && !empty($this->source) && is_string($this->source[0])) {
                     return InputFormat::fromExtension(pathinfo($this->source[0], PATHINFO_EXTENSION));
                 }
                 break;
-
             case InputSourceType::FINDER:
-                foreach ($this->source as $file) {
-                    return InputFormat::fromExtension($file->getExtension());
+                if (is_iterable($this->source)) {
+                    foreach ($this->source as $file) {
+                        if ($file instanceof \SplFileInfo) {
+                            return InputFormat::fromExtension($file->getExtension());
+                        }
+                    }
                 }
                 break;
         }
@@ -147,8 +152,8 @@ final class InputSource
     public function isMultiple(): bool
     {
         return match ($this->type) {
-            InputSourceType::FILES => count($this->source) > 1,
-            InputSourceType::FINDER => count($this->source) > 1,
+            InputSourceType::FILES => is_array($this->source) && count($this->source) > 1,
+            InputSourceType::FINDER => is_iterable($this->source) && count(iterator_to_array($this->source)) > 1,
             default => false,
         };
     }
@@ -161,12 +166,14 @@ final class InputSource
     public function getFilePaths(): array
     {
         return match ($this->type) {
-            InputSourceType::FILE => [$this->source],
-            InputSourceType::FILES => $this->source,
-            InputSourceType::FINDER => array_map(
-                fn(\SplFileInfo $file) => $file->getRealPath(),
-                iterator_to_array($this->source),
-            ),
+            InputSourceType::FILE => is_string($this->source) ? [$this->source] : [],
+            InputSourceType::FILES => is_array($this->source) ? array_filter($this->source, 'is_string') : [],
+            InputSourceType::FINDER => is_iterable($this->source)
+                ? array_values(array_filter(array_map(
+                    fn($file) => $file instanceof \SplFileInfo ? $file->getRealPath() : null,
+                    iterator_to_array($this->source),
+                ), 'is_string'))
+                : [],
             default => [],
         };
     }
@@ -177,9 +184,9 @@ final class InputSource
     public function getContent(): ?string
     {
         return match ($this->type) {
-            InputSourceType::STRING => $this->source,
-            InputSourceType::FILE => file_get_contents($this->source),
-            InputSourceType::STDIN => file_get_contents('php://stdin'),
+            InputSourceType::STRING => is_string($this->source) ? $this->source : null,
+            InputSourceType::FILE => is_string($this->source) ? ($content = @file_get_contents($this->source)) === false ? null : $content : null,
+            InputSourceType::STDIN => ($content = @file_get_contents('php://stdin')) === false ? null : $content,
             default => null,
         };
     }
@@ -191,8 +198,8 @@ final class InputSource
     {
         return match ($this->type) {
             InputSourceType::FILE, InputSourceType::STRING, InputSourceType::STDIN => 1,
-            InputSourceType::FILES => count($this->source),
-            InputSourceType::FINDER => count($this->source),
+            InputSourceType::FILES => is_array($this->source) ? count($this->source) : 0,
+            InputSourceType::FINDER => is_iterable($this->source) ? count(iterator_to_array($this->source)) : 0,
         };
     }
 }

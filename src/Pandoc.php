@@ -21,6 +21,7 @@ use Pandoc\Converter\Process\ProcessConverter;
  *             separation of concerns, and additional features.
  *
  * @see DocumentConverter For the new improved API
+ * 
  * @author Simon André <smn.andre@gmail.com>
  */
 final class Pandoc implements ConverterInterface

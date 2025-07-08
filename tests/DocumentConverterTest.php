@@ -9,9 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Pandoc\Tests\NewApi;
+namespace Pandoc\Tests;
 
+use Pandoc\BatchConverter;
 use Pandoc\Configuration\ConversionOptions;
+use Pandoc\ConverterCapabilities;
 use Pandoc\DocumentConverter;
 use Pandoc\Format\InputFormat;
 use Pandoc\Format\OutputFormat;
@@ -19,12 +21,14 @@ use Pandoc\IO\InputSource;
 use Pandoc\IO\OutputTarget;
 use Pandoc\Result\ConversionResult;
 use Pandoc\Test\ConverterMock;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Tests for the new DocumentConverter API.
  */
+#[CoversClass(DocumentConverter::class)]
 class DocumentConverterTest extends TestCase
 {
     #[Test]
@@ -74,7 +78,7 @@ class DocumentConverterTest extends TestCase
         $converter = DocumentConverter::create(new ConverterMock());
         $batch = $converter->batch();
 
-        $this->assertInstanceOf(\Pandoc\BatchConverter::class, $batch);
+        $this->assertInstanceOf(BatchConverter::class, $batch);
     }
 
     #[Test]
@@ -83,6 +87,6 @@ class DocumentConverterTest extends TestCase
         $converter = DocumentConverter::create(new ConverterMock());
         $capabilities = $converter->getCapabilities();
 
-        $this->assertInstanceOf(\Pandoc\ConverterCapabilities::class, $capabilities);
+        $this->assertInstanceOf(ConverterCapabilities::class, $capabilities);
     }
 }

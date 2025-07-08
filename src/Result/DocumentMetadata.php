@@ -79,7 +79,13 @@ final class DocumentMetadata
     public static function fromArray(array $data): self
     {
         $title = $data['title'] ?? null;
+        if (!is_string($title) && !is_null($title)) {
+            throw new \InvalidArgumentException('Title must be a string or null.');
+        }
         $author = $data['author'] ?? null;
+        if (!is_string($author) && !is_null($author)) {
+            throw new \InvalidArgumentException('Author must be a string or null.');
+        }
 
         $date = null;
         if (isset($data['date'])) {
@@ -96,11 +102,22 @@ final class DocumentMetadata
 
         $keywords = [];
         if (isset($data['keywords'])) {
-            if (is_array($data['keywords'])) {
-                $keywords = array_map('strval', $data['keywords']);
-            } elseif (is_string($data['keywords'])) {
-                $keywords = array_map('trim', explode(',', $data['keywords']));
+            $keywords = $data['keywords'];
+            if (\is_string($keywords)) {
+                $keywords = explode(',', $keywords);
             }
+            if (!\is_array($keywords)) {
+                throw new \InvalidArgumentException('Keywords must be a string or an array.');
+            }
+            $words = [];
+            foreach ($keywords as $keyword) {
+                if (is_string($keyword)) {
+                    $words[] = trim($keyword);
+                } elseif ($keyword instanceof \Stringable) {
+                    $words[] = (string) $keyword;
+                }
+            }
+            $keywords = $words;
         }
 
         // Remove known fields from custom fields

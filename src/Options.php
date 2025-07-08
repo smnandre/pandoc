@@ -268,6 +268,20 @@ final class Options implements \Countable, \IteratorAggregate
         return $this;
     }
 
+    /**
+     * Set an arbitrary option by key and value.
+     *
+     * @param string $key
+     * @param string $value
+     * @return self
+     */
+    public function setOption(string $key, string $value): self
+    {
+        $clone = clone $this;
+        $clone->options[$key] = $value;
+        return $clone;
+    }
+
     public function merge(Options $other): self
     {
         $merged = clone $this;

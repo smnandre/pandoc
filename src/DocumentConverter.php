@@ -16,7 +16,9 @@ use Pandoc\Converter\ConverterInterface;
 use Pandoc\Converter\Process\ProcessConverter;
 use Pandoc\Format\OutputFormat;
 use Pandoc\IO\InputSource;
+use Pandoc\IO\InputSourceType;
 use Pandoc\IO\OutputTarget;
+use Pandoc\IO\OutputTargetType;
 use Pandoc\Result\ConversionResult;
 use Pandoc\Result\DocumentMetadata;
 
@@ -189,9 +191,15 @@ final class DocumentConverter
             $legacyOptions = $this->createLegacyOptions($input, $tempOutput, $format, $options);
             $this->converter->convert($legacyOptions);
 
-            $content = file_get_contents($tempOutput->getTarget());
+            $outputPath = $tempOutput->getTarget();
+            if (!file_exists($outputPath)) {
+                throw new Exception\ConversionException(
+                    'Expected output file was not created: ' . $outputPath
+                );
+            }
+            $content = file_get_contents($outputPath);
             if ($content === false) {
-                throw new Exception\ConversionException('Failed to read converted content');
+                throw new Exception\ConversionException('Failed to read converted content from: ' . $outputPath);
             }
 
             $duration = microtime(true) - $startTime;
@@ -211,18 +219,47 @@ final class DocumentConverter
         $legacyOptions = Options::create();
 
         // Set input
-        if ($input->getType() === \Pandoc\IO\InputSourceType::FILE) {
-            $legacyOptions = $legacyOptions->setInput([$input->getSource()]);
-        } elseif ($input->getType() === \Pandoc\IO\InputSourceType::FILES) {
-            $legacyOptions = $legacyOptions->setInput($input->getSource());
-        } elseif ($input->getType() === \Pandoc\IO\InputSourceType::FINDER) {
-            $legacyOptions = $legacyOptions->setInput($input->getSource());
+        if ($input->getType() === InputSourceType::FILE) {
+            $source = $input->getSource();
+            if (is_string($source) || $source instanceof \SplFileInfo) {
+                $legacyOptions = $legacyOptions->setInput([$source]);
+            }
+        } elseif ($input->getType() === InputSourceType::FILES) {
+            $inputSource = $input->getSource();
+            if (is_array($inputSource)) {
+                $filtered = array_filter($inputSource, function ($item) {
+                    return is_string($item) || $item instanceof \SplFileInfo;
+                });
+                /** @var array<int, string|\SplFileInfo> $filtered */
+                $legacyOptions = $legacyOptions->setInput($filtered);
+            } elseif (is_iterable($inputSource)) {
+                $iterableFiltered = [];
+                foreach ($inputSource as $item) {
+                    if (is_string($item) || $item instanceof \SplFileInfo) {
+                        $iterableFiltered[] = $item;
+                    }
+                }
+                $legacyOptions = $legacyOptions->setInput($iterableFiltered);
+            }
+        } elseif ($input->getType() === InputSourceType::FINDER) {
+            $inputSource = $input->getSource();
+            if (is_iterable($inputSource)) {
+                $iterableFiltered = [];
+                foreach ($inputSource as $item) {
+                    if (is_string($item) || $item instanceof \SplFileInfo) {
+                        $iterableFiltered[] = $item;
+                    }
+                }
+                $legacyOptions = $legacyOptions->setInput($iterableFiltered);
+            } elseif (is_string($inputSource) || $inputSource instanceof \SplFileInfo) {
+                $legacyOptions = $legacyOptions->setInput([$inputSource]);
+            }
         }
 
         // Set output
-        if ($output->getType() === \Pandoc\IO\OutputTargetType::FILE) {
+        if ($output->getType() === OutputTargetType::FILE) {
             $legacyOptions = $legacyOptions->setOutput($output->getTarget());
-        } elseif ($output->getType() === \Pandoc\IO\OutputTargetType::DIRECTORY) {
+        } elseif ($output->getType() === OutputTargetType::DIRECTORY) {
             $legacyOptions = $legacyOptions->setOutputDir($output->getTarget());
         }
 
@@ -236,7 +273,7 @@ final class DocumentConverter
 
         // Convert new options to legacy options
         foreach ($options->toArray() as $key => $value) {
-            $legacyOptions = $legacyOptions->set($key, $value);
+            $legacyOptions = $legacyOptions->setOption($key, $value);
         }
 
         return $legacyOptions;

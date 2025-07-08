@@ -22,7 +22,7 @@ final class OutputTarget
 {
     private function __construct(
         private readonly OutputTargetType $type,
-        private readonly mixed $target,
+        private readonly ?string $target = null,
     ) {}
 
     /**
@@ -92,8 +92,12 @@ final class OutputTarget
     /**
      * Get the target data.
      */
-    public function getTarget(): mixed
+    public function getTarget(): string
     {
+        if (null === $this->target) {
+            throw new \LogicException('Cannot get target for string output.');
+        }
+
         return $this->target;
     }
 
@@ -103,9 +107,9 @@ final class OutputTarget
     public function generateOutputPath(string $inputPath, OutputFormat $format): string
     {
         return match ($this->type) {
-            OutputTargetType::FILE => $this->target,
+            OutputTargetType::FILE => $this->getTarget(),
             OutputTargetType::DIRECTORY => $this->generateFileInDirectory($inputPath, $format),
-            OutputTargetType::TEMPORARY => $this->target,
+            OutputTargetType::TEMPORARY => $this->getTarget(),
             default => throw new \LogicException('Cannot generate path for this output type'),
         };
     }
@@ -151,8 +155,8 @@ final class OutputTarget
     public function getDirectory(): ?string
     {
         return match ($this->type) {
-            OutputTargetType::DIRECTORY => $this->target,
-            OutputTargetType::FILE, OutputTargetType::TEMPORARY => dirname($this->target),
+            OutputTargetType::DIRECTORY => $this->getTarget(),
+            OutputTargetType::FILE, OutputTargetType::TEMPORARY => dirname($this->getTarget()),
             default => null,
         };
     }
@@ -162,8 +166,8 @@ final class OutputTarget
      */
     public function cleanup(): void
     {
-        if ($this->type === OutputTargetType::TEMPORARY && file_exists($this->target)) {
-            unlink($this->target);
+        if ($this->type === OutputTargetType::TEMPORARY && file_exists($this->getTarget())) {
+            unlink($this->getTarget());
         }
     }
 
@@ -172,6 +176,6 @@ final class OutputTarget
         $basename = pathinfo($inputPath, PATHINFO_FILENAME);
         $extension = $format->getExtension();
 
-        return $this->target . DIRECTORY_SEPARATOR . $basename . '.' . $extension;
+        return $this->getTarget() . DIRECTORY_SEPARATOR . $basename . '.' . $extension;
     }
 }

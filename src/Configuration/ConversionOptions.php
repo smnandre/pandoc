@@ -17,6 +17,8 @@ namespace Pandoc\Configuration;
  * This class provides a fluent interface for configuring Pandoc options
  * without mixing I/O concerns with conversion settings.
  *
+ * @implements \IteratorAggregate<string, string>
+ *
  * @author Simon André <smn.andre@gmail.com>
  */
 final class ConversionOptions implements \Countable, \IteratorAggregate
@@ -178,7 +180,12 @@ final class ConversionOptions implements \Countable, \IteratorAggregate
     // Code highlighting
     public function highlight(bool $enabled = true): self
     {
-        return $this->bool('--highlight-style', $enabled ? 'pygments' : 'null');
+        // Fix: pass bool to bool(), not string
+        if ($enabled) {
+            return $this->string('--highlight-style', 'pygments');
+        } else {
+            return $this->string('--highlight-style', 'null');
+        }
     }
 
     public function highlightStyle(string $style): self
@@ -272,17 +279,31 @@ final class ConversionOptions implements \Countable, \IteratorAggregate
         return $clone;
     }
 
-    // Access methods
+    /**
+     * Convert options to an associative array.
+     *
+     * @return array<string, string>
+     */
     public function toArray(): array
     {
         return $this->options;
     }
 
+    /**
+     * Get all variables set in the options.
+     *
+     * @return array<string, string>
+     */
     public function getVariables(): array
     {
         return $this->variables;
     }
 
+    /**
+     * Get all metadata files set in the options.
+     *
+     * @return array<int, string>
+     */
     public function getMetadataFiles(): array
     {
         return $this->metadataFiles;

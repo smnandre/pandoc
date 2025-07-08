@@ -15,6 +15,12 @@ use Pandoc\Converter\ConverterInterface;
 use Pandoc\Converter\Process\ProcessConverter;
 
 /**
+ * Legacy Pandoc converter class.
+ * 
+ * @deprecated Use DocumentConverter for new projects, which provides better type safety,
+ *             separation of concerns, and additional features.
+ * 
+ * @see DocumentConverter For the new improved API
  * @author Simon André <smn.andre@gmail.com>
  */
 final class Pandoc implements ConverterInterface
@@ -82,5 +88,17 @@ final class Pandoc implements ConverterInterface
     public function listOutputFormats(): array
     {
         return $this->converter->listOutputFormats();
+    }
+
+    /**
+     * Get a new DocumentConverter instance for using the improved API.
+     * 
+     * This provides an easy migration path from the legacy API to the new API.
+     * 
+     * @return DocumentConverter
+     */
+    public function newApi(): DocumentConverter
+    {
+        return DocumentConverter::create($this->converter);
     }
 }

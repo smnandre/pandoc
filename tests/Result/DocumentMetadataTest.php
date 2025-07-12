@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the smnandre/pandoc package.
+ *
+ * (c) Simon Andre <smn.andre@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Pandoc\Tests\Result;
 
 use DateTime;
@@ -44,7 +53,7 @@ class DocumentMetadataTest extends TestCase
     public function itCreatesFromArrayAndValidates(): void
     {
         $data = ['title' => 'T', 'author' => 'A', 'date' => '2022-02-02',
-                 'keywords' => 'a,b', 'extra' => 'v'];
+            'keywords' => 'a,b', 'extra' => 'v'];
         $meta = DocumentMetadata::fromArray($data);
         $this->assertSame(['a', 'b'], $meta->getKeywords());
         $this->assertTrue($meta->hasField('extra'));

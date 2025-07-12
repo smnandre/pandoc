@@ -185,26 +185,34 @@ final class DocumentConverter
         float $startTime,
     ): ConversionResult {
         // For string output, we'll use a temporary file and read it back
+        file_put_contents('/tmp/doc_converter_test_debug.log', "convertToString: entered\n", FILE_APPEND);
         $tempOutput = OutputTarget::temporary('.' . $format->getExtension());
-
         try {
             $legacyOptions = $this->createLegacyOptions($input, $tempOutput, $format, $options);
             $this->converter->convert($legacyOptions);
 
             $outputPath = $tempOutput->getTarget();
-            if (!file_exists($outputPath)) {
-                throw new Exception\ConversionException(
-                    'Expected output file was not created: ' . $outputPath,
-                );
-            }
+            // Debug output for diagnosis
+            file_put_contents(
+                '/tmp/doc_converter_test_debug.log',
+                'convertToString outputPath: ' . $outputPath . "\n" .
+                'file_exists: ' . (file_exists($outputPath) ? 'yes' : 'no') . "\n",
+                FILE_APPEND,
+            );
             $content = file_get_contents($outputPath);
+            file_put_contents(
+                '/tmp/doc_converter_test_debug.log',
+                'file_get_contents: ' . var_export($content, true) . "\n",
+                FILE_APPEND,
+            );
             if ($content === false) {
                 throw new Exception\ConversionException('Failed to read converted content from: ' . $outputPath);
             }
 
             $duration = microtime(true) - $startTime;
 
-            return ConversionResult::stringResult($content, null, $duration);
+            // Return a string result, but also include the temp file path in outputPaths for compatibility
+            return new \Pandoc\Result\ConversionResult([$outputPath], $content, null, $duration);
         } finally {
             $tempOutput->cleanup();
         }
@@ -222,24 +230,18 @@ final class DocumentConverter
         if ($input->getType() === InputSourceType::FILE) {
             $source = $input->getSource();
             if (is_string($source) || $source instanceof \SplFileInfo) {
-                $legacyOptions = $legacyOptions->setInput([$source]);
+                $legacyOptions = $legacyOptions->setInput($source);
             }
         } elseif ($input->getType() === InputSourceType::FILES) {
             $inputSource = $input->getSource();
-            if (is_array($inputSource)) {
-                $filtered = array_filter($inputSource, function ($item) {
-                    return is_string($item) || $item instanceof \SplFileInfo;
-                });
-                /** @var array<int, string|\SplFileInfo> $filtered */
-                $legacyOptions = $legacyOptions->setInput($filtered);
-            } elseif (is_iterable($inputSource)) {
-                $iterableFiltered = [];
+            if (is_array($inputSource) || is_iterable($inputSource)) {
+                $filtered = [];
                 foreach ($inputSource as $item) {
                     if (is_string($item) || $item instanceof \SplFileInfo) {
-                        $iterableFiltered[] = $item;
+                        $filtered[] = $item;
                     }
                 }
-                $legacyOptions = $legacyOptions->setInput($iterableFiltered);
+                $legacyOptions = $legacyOptions->setInput($filtered);
             }
         } elseif ($input->getType() === InputSourceType::FINDER) {
             $inputSource = $input->getSource();
@@ -252,7 +254,12 @@ final class DocumentConverter
                 }
                 $legacyOptions = $legacyOptions->setInput($iterableFiltered);
             } elseif (is_string($inputSource) || $inputSource instanceof \SplFileInfo) {
-                $legacyOptions = $legacyOptions->setInput([$inputSource]);
+                $legacyOptions = $legacyOptions->setInput($inputSource);
+            }
+        } elseif ($input->getType() === InputSourceType::STRING) {
+            $source = $input->getSource();
+            if (is_string($source)) {
+                $legacyOptions = $legacyOptions->setInput($source);
             }
         }
 
@@ -263,12 +270,16 @@ final class DocumentConverter
             $legacyOptions = $legacyOptions->setOutputDir($output->getTarget());
         }
 
-        // Set format
-        $legacyOptions = $legacyOptions->setFormat($format->value);
+        // Fallback: ensure output is set for string conversions (temp file)
+        if ($legacyOptions->getOutput() === null && $output->isTemporary()) {
+            $legacyOptions = $legacyOptions->setOutput($output->getTarget());
+        }
 
-        // Set input format if specified
+        $legacyOptions = $legacyOptions->setFormat($format->value);
         if ($input->getFormat()) {
             $legacyOptions = $legacyOptions->from($input->getFormat()->value);
+        } elseif ($input->getType() === InputSourceType::STRING) {
+            $legacyOptions = $legacyOptions->from('markdown');
         }
 
         // Convert new options to legacy options

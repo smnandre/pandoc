@@ -54,6 +54,12 @@ final class ProcessConverter implements ConverterInterface
                 $this->runPandoc($options, $file);
             }
         } else {
+            // Detect string content input (for InputSourceType::STRING)
+            if (is_array($input) && count($input) === 1 && is_string($input[0]) && !file_exists($input[0])) {
+                // Pass string content to Pandoc via stdin
+                $this->runPandocWithStdin($options, $input[0], $output);
+                return;
+            }
             foreach ($input as $inputFile) {
                 if ($output !== null && !is_dir(dirname($output))) {
                     mkdir(dirname($output), 0777, true);
@@ -61,9 +67,31 @@ final class ProcessConverter implements ConverterInterface
                 if (!file_exists($inputFile)) {
                     throw new ConversionException('Input file not found: ' . $inputFile);
                 }
-
                 $this->runPandoc($options, new \SplFileInfo($inputFile));
             }
+        }
+    }
+
+    private function runPandocWithStdin(Options $options, string $content, ?string $output): void
+    {
+        $pandoc = $this->executable;
+        $args = [];
+        foreach ($options->toArray() as $key => $value) {
+            $args[] = $key;
+            if ($value !== 'true') {
+                $args[] = $value;
+            }
+        }
+        if ($output !== null) {
+            $args[] = '-o';
+            $args[] = $output;
+        }
+        $process = new Process(array_merge([$pandoc], $args));
+        $process->setInput($content);
+        $process->run();
+        if (!$process->isSuccessful()) {
+            $exitCode = $process->getExitCode();
+            throw new ConversionException(trim($process->getErrorOutput()), $exitCode ?? -1);
         }
     }
 

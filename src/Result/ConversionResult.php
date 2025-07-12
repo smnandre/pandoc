@@ -98,9 +98,6 @@ final class ConversionResult
         return !empty($this->warnings);
     }
 
-    /**
-     * Check if this is a string result.
-     */
     public function isStringResult(): bool
     {
         return $this->content !== null;

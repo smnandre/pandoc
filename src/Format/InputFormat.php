@@ -127,7 +127,15 @@ enum InputFormat: string
      */
     public static function fromExtension(string $extension): ?self
     {
+        $extension = ltrim(strtolower($extension), '.');
+        // Explicit mapping for markdown extensions
+        if (in_array($extension, ['md', 'markdown', 'mkd', 'mdown'], true)) {
+            return self::MARKDOWN;
+        }
         foreach (self::cases() as $format) {
+            if ($format === self::MARKDOWN) {
+                continue; // Already handled above
+            }
             if ($format->supportsExtension($extension)) {
                 return $format;
             }

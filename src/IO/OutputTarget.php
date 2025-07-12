@@ -60,7 +60,9 @@ final class OutputTarget
      */
     public static function string(): self
     {
-        return new self(OutputTargetType::STRING, null);
+        // Use a temp file for string output, but set type to STRING so DocumentConverter uses convertToString
+        $tempFile = tempnam(sys_get_temp_dir(), 'pandoc_') . '.html';
+        return new self(OutputTargetType::STRING, $tempFile);
     }
 
     /**
@@ -77,8 +79,7 @@ final class OutputTarget
     public static function temporary(string $suffix = '', ?string $dir = null): self
     {
         $tempFile = tempnam($dir ?? sys_get_temp_dir(), 'pandoc_') . $suffix;
-
-        return new self(OutputTargetType::TEMPORARY, $tempFile);
+        return new self(OutputTargetType::FILE, $tempFile);
     }
 
     /**

@@ -13,14 +13,12 @@ namespace Pandoc\Tests\Functional;
 
 use Pandoc\Converter\Process\PandocExecutableFinder;
 use Pandoc\Converter\Process\ProcessConverter;
-use Pandoc\Exception\ConversionException;
 use Pandoc\Options;
 use Pandoc\Pandoc;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\Finder;
 
 #[CoversClass(Pandoc::class)]
 #[UsesClass(Options::class)]

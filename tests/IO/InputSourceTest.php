@@ -18,8 +18,6 @@ use Pandoc\IO\InputSourceType;
 use Pandoc\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Finder\Finder;
 
 #[CoversClass(InputSource::class)]
 class InputSourceTest extends TestCase

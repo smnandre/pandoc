@@ -12,12 +12,8 @@
 namespace Pandoc\Exception;
 
 /**
- * Base exception for all Pandoc-related errors.
+ * Thrown when invalid arguments are provided.
  */
-class PandocException extends \RuntimeException
+final class InvalidArgumentException extends \InvalidArgumentException
 {
-    public function __construct(string $message = '', int $code = 0, ?\Throwable $previous = null)
-    {
-        parent::__construct($message, $code, $previous);
-    }
 }

@@ -29,13 +29,13 @@
     "require": {
         "php": "^8.3",
         "psr/log": "^2.0 || ^3.0",
-        "symfony/process": "^7.1"
+        "symfony/process": "^7.3 || ^8.0"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.65",
-        "phpstan/phpstan": "^2.0",
-        "phpunit/phpunit": "^11.5",
-        "symfony/filesystem": "7.2.*"
+        "friendsofphp/php-cs-fixer": "^3.82",
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^12.3",
+        "symfony/filesystem": "^7.3 || ^8.0"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -57,10 +57,10 @@
         "sort-packages": true
     },
     "scripts": {
-        "analyse": "phpstan analyse",
-        "cs-fix": "php-cs-fixer fix --diff",
-        "cs-lint": "php-cs-fixer check --diff",
-        "test": "phpunit",
-        "test-coverage": "phpunit --coverage-html=coverage"
+        "analyse": "vendor/bin/phpstan analyse",
+        "cs-fix": "vendor/bin/php-cs-fixer fix --diff",
+        "cs-lint": "vendor/bin/php-cs-fixer check --diff",
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html=coverage"
     }
 }

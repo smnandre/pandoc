@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the smnandre/pandoc package.
  *
@@ -11,75 +13,251 @@
 
 namespace Pandoc;
 
-use Pandoc\Converter\ConverterInterface;
-use Pandoc\Converter\Process\ProcessConverter;
-
 /**
- * @author Simon André <smn.andre@gmail.com>
+ * Static facade for convenience - delegates to injected or default converter.
  */
-final class Pandoc implements ConverterInterface
+final class Pandoc
 {
-    private ConverterInterface $converter;
+    private static ?ConverterInterface $sharedConverter = null;
+    private static ?BinaryInterface $defaultBinary = null;
 
-    private ?Options $defaultOptions;
-
-    public function __construct(?ConverterInterface $converter = null, ?Options $defaultOptions = null)
-    {
-        $this->converter = $converter ?? new ProcessConverter();
-        $this->defaultOptions = $defaultOptions;
-    }
-
-    public static function create(?ConverterInterface $converter = null, ?Options $defaultOptions = null): self
-    {
-        return new self($converter, $defaultOptions);
+    /**
+     * Quick string conversion.
+     */
+    /**
+     * @param array<string, mixed> $options
+     */
+    public static function convert(
+        string $input,
+        string $format,
+        array $options = [],
+    ): string {
+        return self::getConverter()
+            ->content($input)
+            ->to($format)
+            ->options($options)
+            ->getContent();
     }
 
     /**
-     * @throws Exception\PandocException
+     * Quick file conversion.
      */
-    public function convert(Options $options): void
+    /**
+     * @param array<string, mixed> $options
+     */
+    public static function convertFile(
+        string $inputFile,
+        string $outputFile,
+        array $options = [],
+    ): Conversion {
+        return self::getConverter()
+            ->file($inputFile)
+            ->output($outputFile)
+            ->options($options)
+            ->convert();
+    }
+
+    /**
+     * Start with input.
+     */
+    public static function input(string $input): ConverterInterface
     {
-        if (null !== $this->defaultOptions) {
-            $options = $this->defaultOptions->merge($options);
+        return self::getConverter()->input($input);
+    }
+
+    /**
+     * Start with explicit content.
+     */
+    public static function content(string $input): ConverterInterface
+    {
+        return self::getConverter()->content($input);
+    }
+
+    /**
+     * Start with explicit input file.
+     */
+    public static function file(string $filename): ConverterInterface
+    {
+        return self::getConverter()->file($filename);
+    }
+
+    public static function to(string $format): ConverterInterface
+    {
+        return self::getConverter()->to($format);
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     */
+    public static function with(array $options): ConverterInterface
+    {
+        return self::getConverter()->options($options);
+    }
+
+    /**
+     * Get fresh converter instance.
+     */
+    public static function converter(?BinaryInterface $binary = null): ConverterInterface
+    {
+        return Converter::create($binary ?? self::$defaultBinary);
+    }
+
+    /**
+     * Create options object.
+     *
+     * @param array<string, mixed> $options
+     */
+    public static function options(array $options = []): Options
+    {
+        return Options::create($options);
+    }
+
+    public static function setConverter(ConverterInterface $converter): void
+    {
+        self::$sharedConverter = $converter;
+    }
+
+    public static function resetConverter(): void
+    {
+        self::$sharedConverter = null;
+    }
+
+    public static function setDefaultBinary(BinaryInterface $binary): void
+    {
+        self::$defaultBinary = $binary;
+    }
+
+    public static function resetDefaultBinary(): void
+    {
+        self::$defaultBinary = null;
+    }
+
+    private static function getConverter(): ConverterInterface
+    {
+        return self::$sharedConverter ?? Converter::create(self::$defaultBinary);
+    }
+
+    private static function getBinary(): BinaryInterface
+    {
+        if (null !== self::$defaultBinary) {
+            return self::$defaultBinary;
         }
 
-        $this->converter->convert($options);
+        return self::$defaultBinary = PandocBinary::create();
     }
 
-    public function getPandocInfo(): PandocInfo
+    public static function isInstalled(): bool
     {
-        return $this->converter->getPandocInfo();
+        try {
+            if (self::$defaultBinary instanceof BinaryInterface) {
+                self::$defaultBinary->getVersion();
+
+                return true;
+            }
+
+            return PandocBinary::isInstalled();
+        } catch (\Exception) {
+            return false;
+        }
     }
 
-    /**
-     * @return list<string>
-     */
-    public function listHighlightLanguages(): array
+    public static function version(): string
     {
-        return $this->converter->listHighlightLanguages();
-    }
-
-    /**
-     * @return list<string>
-     */
-    public function listHighlightStyles(): array
-    {
-        return $this->converter->listHighlightStyles();
-    }
-
-    /**
-     * @return list<string>
-     */
-    public function listInputFormats(): array
-    {
-        return $this->converter->listInputFormats();
+        return self::getBinary()->getVersion();
     }
 
     /**
      * @return list<string>
      */
-    public function listOutputFormats(): array
+    public static function inputFormats(): array
     {
-        return $this->converter->listOutputFormats();
+        return self::getBinary()->getInputFormats();
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function outputFormats(): array
+    {
+        return self::getBinary()->getOutputFormats();
+    }
+
+    public static function supports(string $from, string $to): bool
+    {
+        return self::getBinary()->supports($from, $to);
+    }
+
+    public static function canConvertFile(string $inputFile, string $outputFile): bool
+    {
+        try {
+            if (!file_exists($inputFile)) {
+                return false;
+            }
+
+            $inputFormat = Format::fromFile($inputFile);
+            $outputFormat = Format::fromFile($outputFile);
+
+            if (!$inputFormat || !$outputFormat) {
+                return false;
+            }
+
+            return self::supports($inputFormat->value, $outputFormat->value);
+        } catch (\Exception) {
+            return false;
+        }
+    }
+
+    /**
+     * @return list<Format>
+     */
+    public static function getSuggestedFormats(string $inputFile): array
+    {
+        $inputFormat = Format::fromFile($inputFile);
+
+        if (!$inputFormat) {
+            return [];
+        }
+
+        $supportedFormats = [];
+        foreach (Format::outputFormats() as $format) {
+            if (self::supports($inputFormat->value, $format->value)) {
+                $supportedFormats[] = $format;
+            }
+        }
+
+        return $supportedFormats;
+    }
+
+    public static function markdownToHtml(string $markdown): string
+    {
+        return self::content($markdown)->from('gfm')->to('html')->getContent();
+    }
+
+    public static function htmlToMarkdown(string $html): string
+    {
+        return self::content($html)->from('html')->to('markdown')->getContent();
+    }
+
+    /**
+     * Convert multiple files to directory.
+     *
+     * @param list<string> $inputFiles
+     *
+     * @return list<Conversion>
+     */
+    public static function convertFiles(array $inputFiles, string $outputDir, string $format): array
+    {
+        $results = [];
+
+        foreach ($inputFiles as $inputFile) {
+            $result = self::getConverter()
+                ->file($inputFile)
+                ->to($format)
+                ->output($outputDir)
+                ->convert();
+            $results[] = $result;
+        }
+
+        return $results;
     }
 }

@@ -11,7 +11,6 @@ permissions:
   contents: read
 
 jobs:
-
   cs:
     name: "Code style"
     runs-on: ubuntu-latest
@@ -27,7 +26,7 @@ jobs:
       - name: "Php-CS-Fixer: version"
         run: php-cs-fixer -V
       - name: "Php-CS-Fixer: check"
-        run: php-cs-fixer check --diff
+        run: php-cs-fixer fix --dry-run --diff
 
   sa:
     name: "Static Analysis"
@@ -38,7 +37,7 @@ jobs:
       - name: "PHP: setup ${{ matrix.php-version }}"
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.3'
           coverage: none
           tools: phpstan
       - name: "Composer: cache config"
@@ -98,8 +97,6 @@ jobs:
           else
             composer install --prefer-dist --no-progress --no-suggest;
           fi
-#      - name: "Pandoc: install"
-#        run: sudo apt-get install pandoc
       - name: "Pandoc: setup"
         uses: pandoc/actions/setup@v1
       - name: "Pandoc: version"
@@ -108,3 +105,8 @@ jobs:
         run: php vendor/bin/phpunit --version
       - name: "PHPUnit: tests"
         run: php vendor/bin/phpunit
+      - name: "Codecov: upload coverage"
+        uses: codecov/codecov-action@v5
+        with:
+          files: .phpunit.coverage/coverage.xml
+          verbose: true

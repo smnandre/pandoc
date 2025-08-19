@@ -14,4 +14,6 @@ namespace Pandoc\Exception;
 /**
  * @author Simon André <smn.andre@gmail.com>
  */
-class ConversionException extends \RuntimeException {}
+class ConversionException extends \RuntimeException
+{
+}

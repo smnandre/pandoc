@@ -14,4 +14,6 @@ namespace Pandoc\Exception;
 /**
  * @author Simon André <smn.andre@gmail.com>
  */
-class RuntimeException extends \RuntimeException implements PandocException {}
+class RuntimeException extends \RuntimeException implements PandocException
+{
+}

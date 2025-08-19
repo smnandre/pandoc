@@ -40,19 +40,19 @@ final class Options implements \Countable, \IteratorAggregate
     }
 
     /**
-    * @return iterable<\SplFileInfo|string>
-    */
+     * @return iterable<\SplFileInfo|string>
+     */
     public function getInput(): iterable
     {
         return $this->input;
     }
 
     /**
-    * @param iterable<\SplFileInfo|string>|string $input
-    */
+     * @param iterable<\SplFileInfo|string>|string $input
+     */
     public function setInput(iterable|string $input): self
     {
-        if (is_string($input)) {
+        if (\is_string($input)) {
             $input = [$input];
         }
 
@@ -104,7 +104,7 @@ final class Options implements \Countable, \IteratorAggregate
 
     public function count(): int
     {
-        return count($this->options);
+        return \count($this->options);
     }
 
     public function dataDir(string $dir): self
@@ -228,7 +228,7 @@ final class Options implements \Countable, \IteratorAggregate
     public function __toString(): string
     {
         return implode(' ', array_map(function (string $name, string $value): string {
-            return $name . '=' . $value;
+            return $name.'='.$value;
         }, array_keys($this->options), $this->options));
     }
 
@@ -238,7 +238,7 @@ final class Options implements \Countable, \IteratorAggregate
     public function toArray(): array
     {
         $options = $this->options;
-        ksort($options, SORT_NATURAL);
+        ksort($options, \SORT_NATURAL);
 
         return $options;
     }
@@ -268,7 +268,7 @@ final class Options implements \Countable, \IteratorAggregate
         return $this;
     }
 
-    public function merge(Options $other): self
+    public function merge(self $other): self
     {
         $merged = clone $this;
 
@@ -278,16 +278,16 @@ final class Options implements \Countable, \IteratorAggregate
         }
 
         // Override input, output, format if set in $other
-        if ($other->getInput() !== []) {
+        if ([] !== $other->getInput()) {
             $merged = $merged->setInput($other->getInput());
         }
-        if ($other->getOutput() !== null) {
+        if (null !== $other->getOutput()) {
             $merged = $merged->setOutput($other->getOutput());
         }
-        if ($other->getOutputDir() !== null) {
+        if (null !== $other->getOutputDir()) {
             $merged = $merged->setOutputDir($other->getOutputDir());
         }
-        if ($other->getFormat() !== null) {
+        if (null !== $other->getFormat()) {
             $merged = $merged->setFormat($other->getFormat());
         }
 

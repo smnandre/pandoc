@@ -17,12 +17,12 @@ class TestCase extends BaseTestCase
 {
     protected function getFixturesDirectory(): string
     {
-        return __DIR__ . '/Fixtures';
+        return __DIR__.'/Fixtures';
     }
 
     protected function getTemporaryDirectory(): string
     {
-        return sys_get_temp_dir() . '/pandoc-test';
+        return sys_get_temp_dir().'/pandoc-test';
     }
 
     protected function createTemporaryFile(string $content = ''): string
@@ -52,7 +52,7 @@ class TestCase extends BaseTestCase
     {
         $tempDir = $this->getTemporaryDirectory();
         if (is_dir($tempDir)) {
-            if ($files = glob($tempDir . '/*')) {
+            if ($files = glob($tempDir.'/*')) {
                 foreach ($files as $file) {
                     if (is_file($file)) {
                         unlink($file);

@@ -12,15 +12,15 @@
 namespace Pandoc\Tests\Converter\Process;
 
 use Pandoc\Converter\Process\PandocExecutableFinder;
+use Pandoc\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
-use Pandoc\Tests\TestCase;
 
 #[CoversClass(PandocExecutableFinder::class)]
 class PandocExecutableFinderTest extends TestCase
 {
     #[Test]
-    public function it_can_find_pandoc_executable(): void
+    public function itCanFindPandocExecutable(): void
     {
         $finder = new PandocExecutableFinder();
         $path = $finder->find();

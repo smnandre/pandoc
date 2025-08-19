@@ -18,11 +18,11 @@ use Pandoc\Options;
 use Pandoc\Pandoc;
 use Pandoc\PandocInfo;
 use Pandoc\Test\ConverterMock;
+use Pandoc\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\MockObject\MockObject;
-use Pandoc\Tests\TestCase;
 
 #[CoversClass(Pandoc::class)]
 #[CoversClass(PandocInfo::class)]
@@ -41,14 +41,14 @@ class PandocTest extends TestCase
     }
 
     #[Test]
-    public function it_can_be_instantiated(): void
+    public function itCanBeInstantiated(): void
     {
         $pandoc = new Pandoc();
         $this->assertInstanceOf(Pandoc::class, $pandoc);
     }
 
     #[Test]
-    public function it_delegates_conversion_to_converter(): void
+    public function itDelegatesConversionToConverter(): void
     {
         $options = Options::create();
 
@@ -61,7 +61,7 @@ class PandocTest extends TestCase
     }
 
     #[Test]
-    public function it_uses_default_options_if_provided(): void
+    public function itUsesDefaultOptionsIfProvided(): void
     {
         $defaultOptions = Options::create()->setFormat('html');
         $options = Options::create()->setInput(['input.md'])->setOutput('output.html');
@@ -82,7 +82,7 @@ class PandocTest extends TestCase
     }
 
     #[Test]
-    public function it_can_be_created_with_default_options(): void
+    public function itCanBeCreatedWithDefaultOptions(): void
     {
         $defaultOptions = Options::create()->setFormat('html');
         $pandoc = Pandoc::create(defaultOptions: $defaultOptions);

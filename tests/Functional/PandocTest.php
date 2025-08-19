@@ -13,14 +13,12 @@ namespace Pandoc\Tests\Functional;
 
 use Pandoc\Converter\Process\PandocExecutableFinder;
 use Pandoc\Converter\Process\ProcessConverter;
-use Pandoc\Exception\ConversionException;
 use Pandoc\Options;
 use Pandoc\Pandoc;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\Finder;
 
 #[CoversClass(Pandoc::class)]
 #[UsesClass(Options::class)]
@@ -32,7 +30,7 @@ class PandocTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->outputDir = sys_get_temp_dir() . '/pandoc-test-output';
+        $this->outputDir = sys_get_temp_dir().'/pandoc-test-output';
         if (!is_dir($this->outputDir)) {
             mkdir($this->outputDir, 0777, true);
         }
@@ -40,7 +38,7 @@ class PandocTest extends TestCase
 
     protected function tearDown(): void
     {
-        $files = glob($this->outputDir . '/*');
+        $files = glob($this->outputDir.'/*');
         foreach ($files as $file) {
             if (is_file($file)) {
                 unlink($file);
@@ -50,29 +48,29 @@ class PandocTest extends TestCase
     }
 
     #[Test]
-    public function it_can_be_instantiated(): void
+    public function itCanBeInstantiated(): void
     {
         $pandoc = new Pandoc();
         $this->assertInstanceOf(Pandoc::class, $pandoc);
     }
 
     #[Test]
-    public function it_can_convert_a_single_file_to_html(): void
+    public function itCanConvertASingleFileToHtml(): void
     {
         $options = Options::create()
-            ->setInput([__DIR__ . '/../Fixtures/input.md'])
-            ->setOutput($this->outputDir . '/output.html')
+            ->setInput([__DIR__.'/../Fixtures/input.md'])
+            ->setOutput($this->outputDir.'/output.html')
             ->setFormat('html')
             ->tableOfContent();
 
         (new Pandoc())->convert($options);
 
-        $this->assertFileExists($this->outputDir . '/output.html');
-        $this->assertStringContainsString('<h1', file_get_contents($this->outputDir . '/output.html'));
+        $this->assertFileExists($this->outputDir.'/output.html');
+        $this->assertStringContainsString('<h1', file_get_contents($this->outputDir.'/output.html'));
     }
 
     #[Test]
-    public function it_uses_default_options_when_set(): void
+    public function itUsesDefaultOptionsWhenSet(): void
     {
         $defaultOptions = Options::create()
             ->setFormat('txt');
@@ -80,21 +78,21 @@ class PandocTest extends TestCase
         $pandoc = Pandoc::create(defaultOptions: $defaultOptions);
 
         $options = Options::create()
-            ->setInput([__DIR__ . '/../Fixtures/input.md'])
-            ->setOutput($this->outputDir . '/output_with_default.html')
+            ->setInput([__DIR__.'/../Fixtures/input.md'])
+            ->setOutput($this->outputDir.'/output_with_default.html')
             ->setFormat('html');
 
         $pandoc->convert($options);
 
-        $this->assertFileExists($this->outputDir . '/output_with_default.html');
-        $this->assertStringContainsString('<h1', file_get_contents($this->outputDir . '/output_with_default.html'));
+        $this->assertFileExists($this->outputDir.'/output_with_default.html');
+        $this->assertStringContainsString('<h1', file_get_contents($this->outputDir.'/output_with_default.html'));
     }
 
     #[Test]
-    public function it_can_convert_a_single_file_to_stdout(): void
+    public function itCanConvertASingleFileToStdout(): void
     {
-        $inputFile = realpath(__DIR__ . '/../Fixtures/input.md'); // Adjust path
-        $this->assertNotFalse($inputFile, 'Input file does not exist: ' . __DIR__ . '/../Fixtures/input.md');
+        $inputFile = realpath(__DIR__.'/../Fixtures/input.md'); // Adjust path
+        $this->assertNotFalse($inputFile, 'Input file does not exist: '.__DIR__.'/../Fixtures/input.md');
 
         $options = Options::create()
             ->setInput([$inputFile])

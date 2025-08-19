@@ -16,8 +16,9 @@ final readonly class PandocInfo
     public function __construct(
         private string $path,
         private string $version,
-        private string|null $luaVersion = null,
-    ) {}
+        private ?string $luaVersion = null,
+    ) {
+    }
 
     public function getPath(): string
     {
@@ -29,7 +30,7 @@ final readonly class PandocInfo
         return $this->version;
     }
 
-    public function getLuaVersion(): string|null
+    public function getLuaVersion(): ?string
     {
         return $this->luaVersion;
     }

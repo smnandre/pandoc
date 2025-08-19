@@ -30,7 +30,7 @@ class ExitCodeTest extends TestCase
     public function testFailures(): void
     {
         foreach (ExitCode::cases() as $exitCode) {
-            if ($exitCode->value === 0) {
+            if (0 === $exitCode->value) {
                 continue;
             }
             $this->assertNotSame(0, $exitCode->value);

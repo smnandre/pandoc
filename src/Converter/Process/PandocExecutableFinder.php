@@ -19,7 +19,7 @@ use Symfony\Component\Process\ExecutableFinder;
  * @internal
  *
  * @author Simon André <smn.andre@gmail.com>
-*/
+ */
 final class PandocExecutableFinder
 {
     public function find(): ?string

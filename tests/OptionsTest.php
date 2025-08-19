@@ -20,49 +20,49 @@ use PHPUnit\Framework\TestCase;
 class OptionsTest extends TestCase
 {
     #[Test]
-    public function it_can_be_instantiated(): void
+    public function itCanBeInstantiated(): void
     {
         $options = Options::create();
         $this->assertInstanceOf(Options::class, $options);
     }
 
     #[Test]
-    public function it_can_set_and_get_input(): void
+    public function itCanSetAndGetInput(): void
     {
         $options = Options::create()->setInput(['input.md']);
         $this->assertSame(['input.md'], $options->getInput());
     }
 
     #[Test]
-    public function it_can_set_input_with_deprecated_method(): void
+    public function itCanSetInputWithDeprecatedMethod(): void
     {
         $options = Options::create()->input('input.md');
         $this->assertEquals('input.md', $options->toArray()['-i']);
     }
 
     #[Test]
-    public function it_can_set_and_get_output(): void
+    public function itCanSetAndGetOutput(): void
     {
         $options = Options::create()->setOutput('output.pdf');
         $this->assertSame('output.pdf', $options->getOutput());
     }
 
     #[Test]
-    public function it_can_set_output_with_deprecated_method(): void
+    public function itCanSetOutputWithDeprecatedMethod(): void
     {
         $options = Options::create()->output('output.pdf');
         $this->assertEquals('output.pdf', $options->toArray()['-o']);
     }
 
     #[Test]
-    public function it_can_set_and_get_format(): void
+    public function itCanSetAndGetFormat(): void
     {
         $options = Options::create()->setFormat('pdf');
         $this->assertSame('pdf', $options->getFormat());
     }
 
     #[Test]
-    public function it_can_handle_boolean_options(): void
+    public function itCanHandleBooleanOptions(): void
     {
         $options = Options::create()
             ->tableOfContent()
@@ -77,7 +77,7 @@ class OptionsTest extends TestCase
     }
 
     #[Test]
-    public function it_can_convert_to_string(): void
+    public function itCanConvertToString(): void
     {
         $options = Options::create()
             ->tableOfContent();
@@ -86,7 +86,7 @@ class OptionsTest extends TestCase
     }
 
     #[Test]
-    public function it_can_return_options_as_array(): void
+    public function itCanReturnOptionsAsArray(): void
     {
         $options = Options::create()
             ->tocDepth(1)
@@ -99,17 +99,17 @@ class OptionsTest extends TestCase
     }
 
     #[Test]
-    public function it_implements_countable(): void
+    public function itImplementsCountable(): void
     {
         $options = Options::create()
             ->tocDepth(1)
             ->columns(80);
 
-        $this->assertSame(2, count($options));
+        $this->assertSame(2, \count($options));
     }
 
     #[Test]
-    public function it_implements_iterator_aggregate(): void
+    public function itImplementsIteratorAggregate(): void
     {
         $options = Options::create()
             ->tocDepth(1)
@@ -130,21 +130,21 @@ class OptionsTest extends TestCase
     }
 
     #[Test]
-    public function it_can_set_title_prefix(): void
+    public function itCanSetTitlePrefix(): void
     {
         $options = Options::create()->titlePrefix('Prefix');
         $this->assertSame('Prefix', $options->toArray()['--title-prefix']);
     }
 
     #[Test]
-    public function it_can_set_to(): void
+    public function itCanSetTo(): void
     {
         $options = Options::create()->to('html');
         $this->assertSame('html', $options->toArray()['--to']);
     }
 
     #[Test]
-    public function it_can_set_toc_option(): void
+    public function itCanSetTocOption(): void
     {
         $options = Options::create()->toc();
         $this->assertSame('true', $options->toArray()['--toc']);
@@ -154,14 +154,14 @@ class OptionsTest extends TestCase
     }
 
     #[Test]
-    public function it_can_set_output_format(): void
+    public function itCanSetOutputFormat(): void
     {
         $options = Options::create()->outputFormat('html');
         $this->assertSame('html', $options->toArray()['-t']);
     }
 
     #[Test]
-    public function it_can_set_preserve_tabs(): void
+    public function itCanSetPreserveTabs(): void
     {
         $options = Options::create()->preserveTabs();
         $this->assertSame('true', $options->toArray()['--preserve-tabs']);
@@ -171,7 +171,7 @@ class OptionsTest extends TestCase
     }
 
     #[Test]
-    public function it_can_set_reference_links(): void
+    public function itCanSetReferenceLinks(): void
     {
         $options = Options::create()->referenceLinks();
         $this->assertSame('true', $options->toArray()['--reference-links']);
@@ -181,7 +181,7 @@ class OptionsTest extends TestCase
     }
 
     #[Test]
-    public function it_can_set_sandbox(): void
+    public function itCanSetSandbox(): void
     {
         $options = Options::create()->sandbox();
         $this->assertSame('true', $options->toArray()['--sandbox']);
@@ -191,14 +191,14 @@ class OptionsTest extends TestCase
     }
 
     #[Test]
-    public function it_can_set_shift_heading_level_by(): void
+    public function itCanSetShiftHeadingLevelBy(): void
     {
         $options = Options::create()->shiftHeadingLevelBy(2);
         $this->assertSame('2', $options->toArray()['--shift-heading-level-by']);
     }
 
     #[Test]
-    public function it_can_set_standalone(): void
+    public function itCanSetStandalone(): void
     {
         $options = Options::create()->standalone();
         $this->assertSame('true', $options->toArray()['--standalone']);
@@ -208,7 +208,7 @@ class OptionsTest extends TestCase
     }
 
     #[Test]
-    public function it_can_set_strip_comments(): void
+    public function itCanSetStripComments(): void
     {
         $options = Options::create()->stripComments();
         $this->assertSame('true', $options->toArray()['--strip-comments']);
@@ -218,14 +218,14 @@ class OptionsTest extends TestCase
     }
 
     #[Test]
-    public function it_can_set_tab_stop(): void
+    public function itCanSetTabStop(): void
     {
         $options = Options::create()->tabStop(8);
         $this->assertSame('8', $options->toArray()['--tab-stop']);
     }
 
     #[Test]
-    public function it_can_set_list_tables(): void
+    public function itCanSetListTables(): void
     {
         $options = Options::create()->listTables();
         $this->assertSame('true', $options->toArray()['--list-tables']);
@@ -235,14 +235,14 @@ class OptionsTest extends TestCase
     }
 
     #[Test]
-    public function it_can_set_id_prefix(): void
+    public function itCanSetIdPrefix(): void
     {
         $options = Options::create()->idPrefix('test-');
         $this->assertSame('test-', $options->toArray()['--id-prefix']);
     }
 
     #[Test]
-    public function it_can_set_file_scope(): void
+    public function itCanSetFileScope(): void
     {
         $options = Options::create()->fileScope();
         $this->assertSame('true', $options->toArray()['--file-scope']);
@@ -252,28 +252,28 @@ class OptionsTest extends TestCase
     }
 
     #[Test]
-    public function it_can_set_data_dir(): void
+    public function itCanSetDataDir(): void
     {
         $options = Options::create()->dataDir('/tmp');
         $this->assertSame('/tmp', $options->toArray()['--data-dir']);
     }
 
     #[Test]
-    public function it_can_set_and_get_output_dir(): void
+    public function itCanSetAndGetOutputDir(): void
     {
         $options = Options::create()->setOutputDir('/tmp/output');
         $this->assertSame('/tmp/output', $options->getOutputDir());
     }
 
     #[Test]
-    public function it_can_set_from(): void
+    public function itCanSetFrom(): void
     {
         $options = Options::create()->from('markdown');
         $this->assertSame('markdown', $options->toArray()['--from']);
     }
 
     #[Test]
-    public function it_can_set_input(): void
+    public function itCanSetInput(): void
     {
         $options = Options::create()->setInput(['input.md']);
         $this->assertSame(['input.md'], $options->getInput());
@@ -283,14 +283,14 @@ class OptionsTest extends TestCase
     }
 
     #[Test]
-    public function it_can_set_output(): void
+    public function itCanSetOutput(): void
     {
         $options = Options::create()->setOutput('output.pdf');
         $this->assertSame('output.pdf', $options->getOutput());
     }
 
     #[Test]
-    public function it_can_merge_options(): void
+    public function itCanMergeOptions(): void
     {
         $options1 = Options::create()
             ->tableOfContent()
@@ -320,7 +320,7 @@ class OptionsTest extends TestCase
     }
 
     #[Test]
-    public function it_preserves_original_options_on_merge(): void
+    public function itPreservesOriginalOptionsOnMerge(): void
     {
         $options1 = Options::create()
             ->tableOfContent()
@@ -336,7 +336,7 @@ class OptionsTest extends TestCase
     }
 
     #[Test]
-    public function it_can_merge_output_dir(): void
+    public function itCanMergeOutputDir(): void
     {
         $options1 = Options::create()
             ->setOutputDir('/tmp/output1');

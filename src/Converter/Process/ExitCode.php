@@ -17,7 +17,7 @@ namespace Pandoc\Converter\Process;
  * @internal
  *
  * @author Simon André <smn.andre@gmail.com>
-*/
+ */
 enum ExitCode: int
 {
     case Success = 0;

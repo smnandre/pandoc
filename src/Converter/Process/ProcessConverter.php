@@ -23,7 +23,7 @@ use Symfony\Component\Process\Process;
 
 /**
  * @author Simon André <smn.andre@gmail.com>
-*/
+ */
 final class ProcessConverter implements ConverterInterface
 {
     private readonly string $executable;
@@ -46,7 +46,7 @@ final class ProcessConverter implements ConverterInterface
         $outputDir = $options->getOutputDir();
 
         if ($input instanceof Finder) {
-            if ($outputDir === null && count($input) > 1) {
+            if (null === $outputDir && \count($input) > 1) {
                 throw new ConversionException('Output directory must be specified when converting multiple files.');
             }
 
@@ -55,11 +55,11 @@ final class ProcessConverter implements ConverterInterface
             }
         } else {
             foreach ($input as $inputFile) {
-                if ($output !== null && !is_dir(dirname($output))) {
-                    mkdir(dirname($output), 0777, true);
+                if (null !== $output && !is_dir(\dirname($output))) {
+                    mkdir(\dirname($output), 0777, true);
                 }
                 if (!file_exists($inputFile)) {
-                    throw new ConversionException('Input file not found: ' . $inputFile);
+                    throw new ConversionException('Input file not found: '.$inputFile);
                 }
 
                 $this->runPandoc($options, new \SplFileInfo($inputFile));
@@ -144,7 +144,7 @@ final class ProcessConverter implements ConverterInterface
 
         if (!$process->isSuccessful()) {
             $exitCode = ExitCode::tryFrom($process->getExitCode() ?? -1);
-            throw new ConversionException(trim($exitCode?->name . ' ' . $process->getErrorOutput()), $exitCode->value ?? -1);
+            throw new ConversionException(trim($exitCode?->name.' '.$process->getErrorOutput()), $exitCode->value ?? -1);
         }
 
         return $process->getOutput();
@@ -165,21 +165,20 @@ final class ProcessConverter implements ConverterInterface
         $output = $options->getOutput();
         $outputDir = $options->getOutputDir();
 
-        if ($outputDir !== null) {
+        if (null !== $outputDir) {
             if (!is_dir($outputDir)) {
                 mkdir($outputDir, 0777, true);
             }
 
-            $output = rtrim($outputDir, '/') . '/' . $inputFile->getBasename('.' . $inputFile->getExtension()) . '.' . ($options->getFormat() ?? 'html');
+            $output = rtrim($outputDir, '/').'/'.$inputFile->getBasename('.'.$inputFile->getExtension()).'.'.($options->getFormat() ?? 'html');
         }
 
         $process = $this->createProcess($options, $inputFile->getRealPath(), $output);
 
-
         try {
             $process->mustRun();
 
-            if ($process->getErrorOutput() && is_int($process->getExitCode())) {
+            if ($process->getErrorOutput() && \is_int($process->getExitCode())) {
                 $exitCode = ExitCode::tryFrom($process->getExitCode());
 
                 $this->logger->error('Pandoc conversion failed (no exception thrown): {message}', [
@@ -190,9 +189,7 @@ final class ProcessConverter implements ConverterInterface
                     'errorOutput' => $process->getErrorOutput(),
                 ]);
 
-                throw new ConversionException(
-                    message: 'Pandoc conversion failed. Exit Code: ' . ($exitCode ? $exitCode->value : 'Unknown') . '. Error Output: ' . $process->getErrorOutput(),
-                );
+                throw new ConversionException(message: 'Pandoc conversion failed. Exit Code: '.($exitCode ? $exitCode->value : 'Unknown').'. Error Output: '.$process->getErrorOutput());
             }
         } catch (ProcessFailedException $e) {
             $exitCode = ExitCode::tryFrom($process->getExitCode() ?? -1);
@@ -205,10 +202,7 @@ final class ProcessConverter implements ConverterInterface
                 'errorOutput' => $process->getErrorOutput(),
             ]);
 
-            throw new ConversionException(
-                message: 'Pandoc conversion failed. Exit Code: ' . ($exitCode ? $exitCode->value : 'Unknown'),
-                previous: $e,
-            );
+            throw new ConversionException(message: 'Pandoc conversion failed. Exit Code: '.($exitCode ? $exitCode->value : 'Unknown'), previous: $e);
         }
     }
 
@@ -234,7 +228,7 @@ final class ProcessConverter implements ConverterInterface
 
         $command[] = $input;
 
-        if ($output !== null) {
+        if (null !== $output) {
             $command[] = '-o';
             $command[] = $output;
         }

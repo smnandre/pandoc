@@ -53,7 +53,7 @@ class ConverterMockTest extends TestCase
     }
 
     #[Test]
-    public function it_can_convert_options(): void
+    public function itCanConvertOptions(): void
     {
         $options = Options::create();
 
@@ -64,28 +64,28 @@ class ConverterMockTest extends TestCase
     }
 
     #[Test]
-    public function it_can_list_highlight_languages(): void
+    public function itCanListHighlightLanguages(): void
     {
         $converter = new ConverterMock();
         $this->assertSame(['html', 'php', 'js'], $converter->listHighlightLanguages());
     }
 
     #[Test]
-    public function it_can_list_highlight_styles(): void
+    public function itCanListHighlightStyles(): void
     {
         $converter = new ConverterMock();
         $this->assertSame(['breezedark', 'haddock', 'kate'], $converter->listHighlightStyles());
     }
 
     #[Test]
-    public function it_can_list_input_formats(): void
+    public function itCanListInputFormats(): void
     {
         $converter = new ConverterMock();
         $this->assertSame(['markdown', 'rst'], $converter->listInputFormats());
     }
 
     #[Test]
-    public function it_can_list_output_formats(): void
+    public function itCanListOutputFormats(): void
     {
         $converter = new ConverterMock();
         $this->assertSame(['html', 'docx', 'pdf'], $converter->listOutputFormats());

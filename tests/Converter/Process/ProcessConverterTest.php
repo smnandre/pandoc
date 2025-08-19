@@ -16,13 +16,13 @@ use Pandoc\Converter\Process\ProcessConverter;
 use Pandoc\Exception\ConversionException;
 use Pandoc\Options;
 use Pandoc\PandocInfo;
+use Pandoc\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
-use Pandoc\Tests\TestCase;
 use Symfony\Component\Process\ExecutableFinder;
 
 #[CoversClass(ProcessConverter::class)]
@@ -50,7 +50,7 @@ class ProcessConverterTest extends TestCase
     }
 
     #[Test]
-    public function it_throws_exception_if_pandoc_executable_is_not_found(): void
+    public function itThrowsExceptionIfPandocExecutableIsNotFound(): void
     {
         if (null !== (new ExecutableFinder())->find('pandoc')) {
             $this->markTestSkipped('Pandoc executable found on the system.');
@@ -63,10 +63,10 @@ class ProcessConverterTest extends TestCase
     }
 
     #[Test]
-    public function it_converts_single_file_with_options(): void
+    public function itConvertsSingleFileWithOptions(): void
     {
-        $inputFile = $this->getFixturesDirectory() . '/input.md';
-        $outputFile = $this->getTemporaryDirectory() . '/output.html';
+        $inputFile = $this->getFixturesDirectory().'/input.md';
+        $outputFile = $this->getTemporaryDirectory().'/output.html';
 
         $options = Options::create()
             ->setInput([$inputFile])
@@ -81,10 +81,10 @@ class ProcessConverterTest extends TestCase
     }
 
     #[Test]
-    public function it_converts_markdown_to_rst(): void
+    public function itConvertsMarkdownToRst(): void
     {
         $inputFile = $this->createTemporaryFile('# Test Heading');
-        $outputFile = $this->getTemporaryDirectory() . '/output.rst';
+        $outputFile = $this->getTemporaryDirectory().'/output.rst';
 
         $options = Options::create()
             ->setInput([$inputFile])
@@ -99,10 +99,10 @@ class ProcessConverterTest extends TestCase
     }
 
     #[Test]
-    public function it_converts_rst_to_markdown(): void
+    public function itConvertsRstToMarkdown(): void
     {
         $inputFile = $this->createTemporaryFile("Test Heading\n============");
-        $outputFile = $this->getTemporaryDirectory() . '/output.md';
+        $outputFile = $this->getTemporaryDirectory().'/output.md';
 
         $options = Options::create()
             ->setInput([$inputFile])
@@ -117,7 +117,7 @@ class ProcessConverterTest extends TestCase
     }
 
     #[Test]
-    public function it_converts_multiple_files_using_finder(): void
+    public function itConvertsMultipleFilesUsingFinder(): void
     {
         $outputDir = $this->getTemporaryDirectory();
 
@@ -133,17 +133,17 @@ class ProcessConverterTest extends TestCase
 
         $this->converter->convert($options);
 
-        $this->assertFileExists($outputDir . '/chapter1.docx');
-        $this->assertFileExists($outputDir . '/chapter2.docx');
-        $this->assertFileExists($outputDir . '/chapter3.docx');
+        $this->assertFileExists($outputDir.'/chapter1.docx');
+        $this->assertFileExists($outputDir.'/chapter2.docx');
+        $this->assertFileExists($outputDir.'/chapter3.docx');
     }
 
     #[Test]
-    public function it_throws_exception_on_conversion_failure(): void
+    public function itThrowsExceptionOnConversionFailure(): void
     {
         $this->expectException(ConversionException::class);
-        $inputFile = $this->getFixturesDirectory() . '/input.md';
-        $outputFile = $this->getTemporaryDirectory() . '/output.html';
+        $inputFile = $this->getFixturesDirectory().'/input.md';
+        $outputFile = $this->getTemporaryDirectory().'/output.html';
 
         $options = Options::create()
             ->setInput([$inputFile])
@@ -154,7 +154,7 @@ class ProcessConverterTest extends TestCase
     }
 
     #[Test]
-    public function it_throws_exception_if_output_dir_not_specified_with_finder(): void
+    public function itThrowsExceptionIfOutputDirNotSpecifiedWithFinder(): void
     {
         $this->expectException(ConversionException::class);
         $this->expectExceptionMessage('Output directory must be specified when converting multiple files.');
@@ -172,10 +172,10 @@ class ProcessConverterTest extends TestCase
     }
 
     #[Test]
-    public function it_can_convert_a_single_file_to_stdout(): void
+    public function itCanConvertASingleFileToStdout(): void
     {
-        $inputFile = realpath(__DIR__ . '/../../Fixtures/input.md');
-        $this->assertNotFalse($inputFile, 'Input file does not exist: ' . __DIR__ . '/../../Fixtures/input.md');
+        $inputFile = realpath(__DIR__.'/../../Fixtures/input.md');
+        $this->assertNotFalse($inputFile, 'Input file does not exist: '.__DIR__.'/../../Fixtures/input.md');
 
         $options = Options::create()
             ->setInput([$inputFile])
@@ -193,7 +193,7 @@ class ProcessConverterTest extends TestCase
     }
 
     #[Test]
-    public function it_returns_pandoc_info(): void
+    public function itReturnsPandocInfo(): void
     {
         $info = $this->converter->getPandocInfo();
 
@@ -202,7 +202,7 @@ class ProcessConverterTest extends TestCase
     }
 
     #[Test]
-    public function it_can_list_input_formats(): void
+    public function itCanListInputFormats(): void
     {
         $inputFormats = $this->converter->listInputFormats();
         $this->assertContains('markdown', $inputFormats);
@@ -210,7 +210,7 @@ class ProcessConverterTest extends TestCase
     }
 
     #[Test]
-    public function it_can_list_output_formats(): void
+    public function itCanListOutputFormats(): void
     {
         $outputFormats = $this->converter->listOutputFormats();
         $this->assertContains('html', $outputFormats);
@@ -218,7 +218,7 @@ class ProcessConverterTest extends TestCase
     }
 
     #[Test]
-    public function it_can_list_highlight_languages(): void
+    public function itCanListHighlightLanguages(): void
     {
         $languages = $this->converter->listHighlightLanguages();
         $this->assertContains('html', $languages);
@@ -227,7 +227,7 @@ class ProcessConverterTest extends TestCase
     }
 
     #[Test]
-    public function it_can_list_highlight_styles(): void
+    public function itCanListHighlightStyles(): void
     {
         $styles = $this->converter->listHighlightStyles();
         $this->assertContains('breezedark', $styles);

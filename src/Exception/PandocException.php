@@ -14,4 +14,6 @@ namespace Pandoc\Exception;
 /**
  * @author Simon André <smn.andre@gmail.com>
  */
-interface PandocException extends \Throwable {}
+interface PandocException extends \Throwable
+{
+}

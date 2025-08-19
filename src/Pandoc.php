@@ -39,9 +39,8 @@ final class Pandoc implements ConverterInterface
      */
     public function convert(Options $options): void
     {
-        if ($this->defaultOptions !== null) {
+        if (null !== $this->defaultOptions) {
             $options = $this->defaultOptions->merge($options);
-            ;
         }
 
         $this->converter->convert($options);

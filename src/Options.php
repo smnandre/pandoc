@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the smnandre/pandoc package.
  *
@@ -12,285 +14,262 @@
 namespace Pandoc;
 
 /**
- * @implements \IteratorAggregate<string, string>
+ * Options class for Pandoc conversion supporting options, variables, and metadata.
  *
- * @author Simon André <smn.andre@gmail.com>
+ * @implements \IteratorAggregate<string, mixed>
  */
 final class Options implements \Countable, \IteratorAggregate
 {
-    /**
-     * @var array<string, string>
-     */
-    private array $options = [];
+    /** @var array<string, mixed> */
+    private array $options;
+    /** @var array<string, string> */
+    private array $variables;
+    /** @var array<string, string> */
+    private array $metadata;
 
     /**
-     * @var iterable<\SplFileInfo>|string[]
+     * @param array<string, mixed> $options
      */
-    private iterable $input = [];
-
-    private ?string $output = null;
-
-    private ?string $outputDir = null;
-
-    private ?string $format = null;
-
-    public static function create(): self
+    public static function create(array $options = []): self
     {
-        return new self();
+        return new self($options);
     }
 
     /**
-     * @return iterable<\SplFileInfo|string>
+     * @param array<string, mixed>  $options
+     * @param array<string, string> $variables
+     * @param array<string, string> $metadata
      */
-    public function getInput(): iterable
+    public function __construct(array $options = [], array $variables = [], array $metadata = [])
     {
-        return $this->input;
+        $this->options = $options;
+        $this->variables = $variables;
+        $this->metadata = $metadata;
     }
 
-    /**
-     * @param iterable<\SplFileInfo|string>|string $input
-     */
-    public function setInput(iterable|string $input): self
+    public function option(string $key, mixed $value): self
     {
-        if (\is_string($input)) {
-            $input = [$input];
-        }
+        $clone = clone $this;
+        $clone->options[$key] = $value;
 
-        $this->input = $input;
-
-        return $this;
-    }
-
-    public function getOutput(): ?string
-    {
-        return $this->output;
-    }
-
-    public function setOutput(string $output): self
-    {
-        $this->output = $output;
-
-        return $this;
-    }
-
-    public function getOutputDir(): ?string
-    {
-        return $this->outputDir;
-    }
-
-    public function setOutputDir(?string $outputDir): self
-    {
-        $this->outputDir = $outputDir;
-
-        return $this;
-    }
-
-    public function getFormat(): ?string
-    {
-        return $this->format;
-    }
-
-    public function setFormat(?string $format): self
-    {
-        $this->format = $format;
-
-        return $this;
+        return $clone;
     }
 
     public function columns(int $columns): self
     {
-        return $this->set('--columns', (string) $columns);
-    }
-
-    public function count(): int
-    {
-        return \count($this->options);
+        return $this->option('columns', $columns);
     }
 
     public function dataDir(string $dir): self
     {
-        return $this->set('--data-dir', $dir);
+        return $this->option('data-dir', $dir);
     }
 
     public function failIfWarnings(bool $fail = true): self
     {
-        return $this->bool('--fail-if-warnings', $fail);
+        return $this->option('fail-if-warnings', $fail);
     }
 
     public function fileScope(bool $fileScope = true): self
     {
-        return $this->bool('--file-scope', $fileScope);
-    }
-
-    public function from(string $format): self
-    {
-        return $this->string('--from', $format);
-    }
-
-    /**
-     * @return \ArrayIterator<string, string>
-     */
-    public function getIterator(): \ArrayIterator
-    {
-        return new \ArrayIterator($this->toArray());
+        return $this->option('file-scope', $fileScope);
     }
 
     public function idPrefix(string $prefix): self
     {
-        return $this->string('--id-prefix', $prefix);
-    }
-
-    public function input(string $input): self
-    {
-        return $this->string('-i', $input);
-    }
-
-    public function listTables(bool $list = true): self
-    {
-        return $this->bool('--list-tables', $list);
+        return $this->option('id-prefix', $prefix);
     }
 
     public function numberSections(bool $number = true): self
     {
-        return $this->bool('--number-sections', $number);
-    }
-
-    public function output(string $output): self
-    {
-        return $this->string('-o', $output);
-    }
-
-    public function outputFormat(string $format): self
-    {
-        return $this->string('-t', $format);
+        return $this->option('number-sections', $number);
     }
 
     public function preserveTabs(bool $preserveTabs = true): self
     {
-        return $this->bool('--preserve-tabs', $preserveTabs);
+        return $this->option('preserve-tabs', $preserveTabs);
     }
 
     public function referenceLinks(bool $referenceLinks = true): self
     {
-        return $this->bool('--reference-links', $referenceLinks);
+        return $this->option('reference-links', $referenceLinks);
     }
 
     public function sandbox(bool $sandbox = true): self
     {
-        return $this->bool('--sandbox', $sandbox);
+        return $this->option('sandbox', $sandbox);
     }
 
     public function shiftHeadingLevelBy(int $level): self
     {
-        return $this->string('--shift-heading-level-by', (string) $level);
+        return $this->option('shift-heading-level-by', $level);
     }
 
     public function standalone(bool $standalone = true): self
     {
-        return $this->bool('--standalone', $standalone);
+        return $this->option('standalone', $standalone);
     }
 
     public function stripComments(bool $strip = true): self
     {
-        return $this->bool('--strip-comments', $strip);
+        return $this->option('strip-comments', $strip);
     }
 
     public function tabStop(int $tabStop): self
     {
-        return $this->set('--tab-stop', (string) $tabStop);
+        return $this->option('tab-stop', $tabStop);
     }
 
     public function tableOfContent(bool $toc = true): self
     {
-        return $this->bool('--toc', $toc);
-    }
-
-    public function titlePrefix(string $string): self
-    {
-        return $this->string('--title-prefix', $string);
-    }
-
-    public function to(string $format): self
-    {
-        return $this->string('--to', $format);
+        return $this->option('toc', $toc);
     }
 
     public function toc(bool $toc = true): self
     {
-        return $this->bool('--toc', $toc);
+        return $this->option('toc', $toc);
     }
 
     public function tocDepth(int $depth): self
     {
-        return $this->set('--toc-depth', (string) $depth);
+        return $this->option('toc-depth', $depth);
+    }
+
+    public function titlePrefix(string $string): self
+    {
+        return $this->option('title-prefix', $string);
+    }
+
+    public function variable(string $key, string $value): self
+    {
+        $clone = clone $this;
+        $clone->variables[$key] = $value;
+
+        return $clone;
+    }
+
+    /**
+     * @param array<string, string> $variables
+     */
+    public function withVariables(array $variables): self
+    {
+        $clone = clone $this;
+        $clone->variables = array_merge($clone->variables, $variables);
+
+        return $clone;
+    }
+
+    public function metadata(string $key, string $value): self
+    {
+        $clone = clone $this;
+        $clone->metadata[$key] = $value;
+
+        return $clone;
+    }
+
+    /**
+     * @param array<string, string> $metadata
+     */
+    public function withMetadata(array $metadata): self
+    {
+        $clone = clone $this;
+        $clone->metadata = array_merge($clone->metadata, $metadata);
+
+        return $clone;
     }
 
     public function __toString(): string
     {
-        return implode(' ', array_map(function (string $name, string $value): string {
-            return $name.'='.$value;
-        }, array_keys($this->options), $this->options));
+        $parts = [];
+
+        foreach ($this->options as $name => $value) {
+            if (\is_bool($value)) {
+                if ($value) {
+                    $parts[] = "--{$name}";
+                }
+            } else {
+                if (\is_scalar($value) || (\is_object($value) && method_exists($value, '__toString'))) {
+                    $parts[] = "--{$name}=".(string) $value;
+                }
+            }
+        }
+
+        foreach ($this->variables as $key => $value) {
+            $parts[] = "--variable={$key}:{$value}";
+        }
+
+        foreach ($this->metadata as $key => $value) {
+            $parts[] = "--metadata={$key}:{$value}";
+        }
+
+        return implode(' ', $parts);
     }
 
     /**
-     * @return array<string, string>
+     * Return structured array with options, variables, and metadata.
+     *
+     * @return array{options: array<string, mixed>, variables: array<string, string>, metadata: array<string, string>}
      */
     public function toArray(): array
     {
-        $options = $this->options;
-        ksort($options, \SORT_NATURAL);
-
-        return $options;
+        return [
+            'options' => $this->options,
+            'variables' => $this->variables,
+            'metadata' => $this->metadata,
+        ];
     }
 
-    private function bool(string $name, bool $value): self
+    /**
+     * Get only the options (for backward compatibility).
+     *
+     * @return array<string, mixed>
+     */
+    public function getOptions(): array
     {
-        if ($value) {
-            return $this->set($name, 'true');
-        }
-
-        unset($this->options[$name]);
-
-        return $this;
+        return $this->options;
     }
 
-    private function set(string $name, string $value): self
+    /**
+     * Get only the variables.
+     *
+     * @return array<string, string>
+     */
+    public function getVariables(): array
     {
-        $this->options[$name] = $value;
-
-        return $this;
+        return $this->variables;
     }
 
-    private function string(string $name, string $value): self
+    /**
+     * Get only the metadata.
+     *
+     * @return array<string, string>
+     */
+    public function getMetadata(): array
     {
-        $this->options[$name] = $value;
+        return $this->metadata;
+    }
 
-        return $this;
+    /**
+     * @return \Traversable<string, mixed>
+     */
+    public function getIterator(): \Traversable
+    {
+        return new \ArrayIterator($this->options);
+    }
+
+    public function count(): int
+    {
+        return \count($this->options) + \count($this->variables) + \count($this->metadata);
     }
 
     public function merge(self $other): self
     {
-        $merged = clone $this;
+        $otherArray = $other->toArray();
 
-        // Merge options
-        foreach ($other->toArray() as $name => $value) {
-            $merged = $merged->set($name, $value); // Use the internal set() to ensure consistency
-        }
-
-        // Override input, output, format if set in $other
-        if ([] !== $other->getInput()) {
-            $merged = $merged->setInput($other->getInput());
-        }
-        if (null !== $other->getOutput()) {
-            $merged = $merged->setOutput($other->getOutput());
-        }
-        if (null !== $other->getOutputDir()) {
-            $merged = $merged->setOutputDir($other->getOutputDir());
-        }
-        if (null !== $other->getFormat()) {
-            $merged = $merged->setFormat($other->getFormat());
-        }
-
-        return $merged;
+        return new self(
+            array_merge($this->options, $otherArray['options']),
+            array_merge($this->variables, $otherArray['variables']),
+            array_merge($this->metadata, $otherArray['metadata'])
+        );
     }
 }
